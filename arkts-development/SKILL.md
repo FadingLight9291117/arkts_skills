@@ -286,3 +286,7 @@ See [references/arkguard-obfuscation.md](references/arkguard-obfuscation.md) for
 - **IDE**: DevEco Studio
 - **SDK**: HarmonyOS SDK
 - **Simulator**: Built-in DevEco Studio emulator
+
+## Related Skills
+
+- **Build & Deploy**: See `harmonyos-build-deploy` skill for building, packaging, and device installation
