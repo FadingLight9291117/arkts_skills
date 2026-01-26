@@ -7,6 +7,40 @@ description: HarmonyOS application build, clean, package and device installation
 
 Complete workflow for building, cleaning, packaging, and installing HarmonyOS applications.
 
+## First Step: Ask User for Operation
+
+**IMPORTANT:** Before executing any build or deploy operation, you MUST first ask the user which specific operation(s) they want to perform using the `question` tool.
+
+Use the following question configuration:
+
+```javascript
+question({
+  questions: [{
+    header: "选择操作",
+    multiple: true,
+    question: "您想要执行哪些构建部署操作？",
+    options: [
+      { label: "清理构建产物", description: "清理之前的构建缓存和产物" },
+      { label: "安装依赖", description: "使用 ohpm 安装项目依赖" },
+      { label: "构建项目", description: "使用 hvigorw 构建 HAP/APP 包" },
+      { label: "安装到设备", description: "使用 hdc 将应用安装到设备" },
+      { label: "完整流程", description: "依次执行清理、安装依赖、构建、部署到设备" }
+    ]
+  }]
+})
+```
+
+**Why ask first:**
+- Different scenarios require different operations (e.g., incremental build vs clean build)
+- Avoid unnecessary time-consuming operations
+- Give user control over the workflow
+- Prevent accidental device installation
+
+**After user responds:**
+- Execute only the selected operations
+- Use the subagent Task tool for time-consuming operations (build, deploy)
+- Report progress and results clearly
+
 ## Quick Reference
 
 ```bash
