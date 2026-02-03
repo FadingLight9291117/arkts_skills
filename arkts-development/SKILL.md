@@ -1,6 +1,6 @@
 ---
 name: arkts-development
-description: HarmonyOS ArkTS application development with ArkUI declarative UI framework. Use when building HarmonyOS/OpenHarmony apps, creating ArkUI components, implementing state management with decorators (@State, @Prop, @Link), migrating from TypeScript to ArkTS, or working with HarmonyOS-specific APIs (router, http, preferences). Covers component lifecycle, layout patterns, and ArkTS language constraints.
+description: HarmonyOS ArkTS application development with ArkUI declarative UI framework. Use when building HarmonyOS/OpenHarmony apps, creating ArkUI components, implementing state management with V1 decorators (@State, @Prop, @Link) or V2 decorators (@Local, @Param, @Event, @ObservedV2, @Trace, @Monitor, @Computed, @Provider, @Consumer), migrating from TypeScript to ArkTS, migrating from V1 to V2 state management, or working with HarmonyOS-specific APIs (router, http, preferences). Covers component lifecycle, layout patterns, AppStorageV2, and ArkTS language constraints.
 ---
 
 # ArkTS Development
@@ -34,13 +34,72 @@ struct HelloWorld {
 
 ## State Management Decorators
 
+### V1 Decorators (使用 `@Component`)
+
 | Decorator | Usage | Description |
 |-----------|-------|-------------|
 | `@State` | `@State count: number = 0` | Component internal state |
 | `@Prop` | `@Prop title: string` | Parent → Child (one-way) |
 | `@Link` | `@Link value: number` | Parent ↔ Child (two-way, use `$varName`) |
-| `@Provide/@Consume` | Cross-level | Ancestor → Descendant |
+| `@Provide/@Consume` | Cross-level | Ancestor → Descendant (one-way) |
 | `@Observed/@ObjectLink` | Nested objects | Deep object observation |
+
+### V2 Decorators (使用 `@ComponentV2`) - 推荐
+
+| Decorator | Usage | Description |
+|-----------|-------|-------------|
+| `@Local` | `@Local count: number = 0` | 组件内部状态（等同 V1 @State） |
+| `@Param` | `@Param title: string` | 父→子单向传递（子组件不可修改） |
+| `@Once` | `@Once @Param value: T` | 仅首次同步，之后子组件可修改 |
+| `@Event` | `@Event onChange: () => void` | 子→父事件回调 |
+| `@Provider()/@Consumer()` | Cross-level | 跨层级**双向**绑定 |
+| `@ObservedV2` | `@ObservedV2 class Foo` | 类深度观察 |
+| `@Trace` | `@Trace prop: T` | 属性变更追踪（配合 @ObservedV2） |
+| `@Monitor` | `@Monitor('prop')` | 状态变化监听（支持深度监听） |
+| `@Computed` | `@Computed get total()` | 计算派生属性 |
+
+### V2 Quick Example
+
+```typescript
+import { AppStorageV2 } from '@kit.ArkUI';
+
+@ObservedV2
+class AppState {
+  @Trace count: number = 0;
+  static connect(): AppState {
+    return AppStorageV2.connect<AppState>(AppState, () => new AppState())!;
+  }
+}
+
+@Entry
+@ComponentV2
+struct HomePage {
+  @Local state: AppState = AppState.connect();
+
+  @Monitor('state.count')
+  onCountChange(): void { console.log('Count changed'); }
+
+  @Computed
+  get doubleCount(): number { return this.state.count * 2; }
+
+  build() {
+    Column({ space: 10 }) {
+      Text(`Count: ${this.state.count}, Double: ${this.doubleCount}`)
+      CounterButton({ onAdd: () => { this.state.count++; } })
+    }
+  }
+}
+
+@ComponentV2
+struct CounterButton {
+  @Event onAdd: () => void = () => {};
+  build() {
+    Button('Add').onClick(() => { this.onAdd(); })
+  }
+}
+```
+
+See [references/state-management-v2.md](references/state-management-v2.md) for complete V2 guide and migration details.
 
 ## Common Layouts
 
@@ -273,6 +332,7 @@ See [references/arkguard-obfuscation.md](references/arkguard-obfuscation.md) for
 
 ## Reference Files
 
+- **State Management V2**: [references/state-management-v2.md](references/state-management-v2.md) - Complete V2 decorators guide (@Local, @Param, @Event, @ObservedV2, @Trace, @Monitor, @Computed) and V1→V2 migration
 - **Migration Guide**: [references/migration-guide.md](references/migration-guide.md) - Complete TypeScript to ArkTS migration rules and examples
 - **Component Patterns**: [references/component-patterns.md](references/component-patterns.md) - Advanced component patterns and best practices
 - **API Reference**: [references/api-reference.md](references/api-reference.md) - Common HarmonyOS APIs

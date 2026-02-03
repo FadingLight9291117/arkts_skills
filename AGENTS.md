@@ -109,7 +109,7 @@ ForEach(this.items, (item: ItemType) => { ... }, (item: ItemType) => item.id)
 
 ### Component Structure
 
-Follow this standard component layout:
+#### V1 Component Layout
 
 ```typescript
 @Entry
@@ -130,6 +130,43 @@ struct ComponentName {
   @Builder ItemCard(item: ItemType) { }
 
   // 5. Build method (always last)
+  build() { }
+}
+```
+
+#### V2 Component Layout (Recommended)
+
+```typescript
+@Entry
+@ComponentV2
+struct ComponentName {
+  // 1. State decorators
+  @Local isLoading: boolean = false;
+  @Local errorMessage: string = '';
+
+  // 2. Params and Events (for child components)
+  @Param title: string = '';
+  @Event onComplete: () => void = () => {};
+
+  // 3. Monitor decorators
+  @Monitor('isLoading')
+  onLoadingChange(): void { /* handle loading change */ }
+
+  // 4. Computed properties
+  @Computed
+  get hasError(): boolean { return this.errorMessage.length > 0; }
+
+  // 5. Lifecycle methods
+  aboutToAppear(): void { this.loadData(); }
+  aboutToDisappear(): void { /* cleanup */ }
+
+  // 6. Business methods
+  async loadData(): Promise<void> { }
+
+  // 7. Builder methods (reusable UI blocks)
+  @Builder ItemCard(item: ItemType) { }
+
+  // 8. Build method (always last)
   build() { }
 }
 ```
@@ -202,12 +239,28 @@ Required fields:
 
 ### State Management Decorators
 
+#### V1 Decorators (with `@Component`)
+
 | Decorator | Direction | Usage |
 |-----------|-----------|-------|
 | `@State` | Internal | Component's own mutable state |
 | `@Prop` | Parent → Child | One-way binding (child copy) |
 | `@Link` | Parent ↔ Child | Two-way binding (pass with `$var`) |
-| `@Provide/@Consume` | Ancestor → Descendant | Cross-level state sharing |
+| `@Provide/@Consume` | Ancestor → Descendant | Cross-level state sharing (one-way) |
+
+#### V2 Decorators (with `@ComponentV2`) - Recommended
+
+| Decorator | Direction | Usage |
+|-----------|-----------|-------|
+| `@Local` | Internal | Component's own state (equiv. V1 @State) |
+| `@Param` | Parent → Child | One-way binding (child cannot modify) |
+| `@Once` | Parent → Child | First sync only, then child manages |
+| `@Event` | Child → Parent | Event callback |
+| `@Provider()/@Consumer()` | Ancestor ↔ Descendant | Cross-level **two-way** binding |
+| `@ObservedV2` | Class | Deep class observation |
+| `@Trace` | Property | Property change tracking |
+| `@Monitor` | Callback | State change listener (deep) |
+| `@Computed` | Getter | Computed/derived property |
 
 ### Layout Components
 
