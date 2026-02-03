@@ -1,4 +1,4 @@
-# OpenCode Skills - HarmonyOS Development
+# Agent Skills - ArkTs/HarmonyOS Development
 
 AI coding agent skills for HarmonyOS/ArkTS application development.
 
