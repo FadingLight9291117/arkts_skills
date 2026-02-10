@@ -195,3 +195,46 @@ description: ...          # Detailed description for agent matching
 - Use **fenced code blocks** with language specifiers (`typescript`, `bash`).
 - Structure content as: Quick Reference first, then detailed sections.
 - Cross-reference related skills and reference files by relative path.
+
+## Maintaining Documentation
+
+### When to Update README.md
+
+**ALWAYS check and update README.md after making changes to the repository.**
+
+Update README when:
+- ✅ **Adding/removing files** - Update the repository structure section
+- ✅ **Adding new features/sections** - Update the "Covers" section of relevant skills
+- ✅ **Modifying project structure** - Update the file tree diagram
+- ✅ **Adding new skill directories** - Add to the "Available Skills" section
+
+Do NOT update README for:
+- ❌ Bug fixes that don't change functionality
+- ❌ Content improvements that don't add new features
+- ❌ Wording/typo corrections
+- ❌ Internal refactoring without user-visible changes
+
+### Update Checklist
+
+When making changes, follow this checklist:
+
+1. Make your changes to skill files
+2. **Check**: Did I add/remove files? → Update file tree in README
+3. **Check**: Did I add new functionality? → Update "Covers" section in README
+4. Commit changes (include README if updated)
+5. Push to **both** remotes: `origin` (GitHub) and `gitea`
+
+### Example Workflow
+
+```bash
+# After making changes
+git add <changed-files>
+git add README.md  # If updated
+
+git commit -m "descriptive message"
+
+# Push to both remotes
+git push origin master
+git push gitea master
+```
+
