@@ -1,10 +1,10 @@
-# OpenCode Skills - HarmonyOS Development
+# AI Skills - HarmonyOS Development
 
 AI coding agent skills for HarmonyOS/ArkTS application development.
 
 ## What are Skills?
 
-Skills are structured documentation that teach AI coding assistants (like OpenCode) how to perform specific development tasks. Each skill contains:
+Skills are structured documentation that teach AI coding assistants how to perform specific development tasks. Each skill contains:
 
 - **SKILL.md** - Main skill definition with quick reference and detailed guides
 - **assets/** - Code templates and examples
@@ -58,13 +58,13 @@ Or search for skills on [skills.sh](https://skills.sh/) and run the correspondin
 npx skills add <owner/repo>
 ```
 
-Once installed, the skill is automatically configured for your AI agent (supports OpenCode, Cursor, Claude Code, Copilot, and other major agents).
+Once installed, the skill is automatically configured for your AI agent (supports Cursor, Claude Code, Copilot, and other major agents).
 
 > No additional CLI installation required — `npx` downloads and runs it automatically. To disable anonymous telemetry, set the environment variable `DISABLE_TELEMETRY=1`.
 
 ## Usage
 
-These skills are automatically loaded by OpenCode when relevant tasks are detected. The AI agent uses the skill documentation to:
+These skills are automatically loaded by the AI agent when relevant tasks are detected. The agent uses the skill documentation to:
 
 1. Follow correct build/deploy procedures
 2. Write code following ArkTS conventions
