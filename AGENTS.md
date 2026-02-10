@@ -221,20 +221,6 @@ When making changes, follow this checklist:
 1. Make your changes to skill files
 2. **Check**: Did I add/remove files? → Update file tree in README
 3. **Check**: Did I add new functionality? → Update "Covers" section in README
-4. Commit changes (include README if updated)
-5. Push to **both** remotes: `origin` (GitHub) and `gitea`
+4. Update README.md if needed
 
-### Example Workflow
-
-```bash
-# After making changes
-git add <changed-files>
-git add README.md  # If updated
-
-git commit -m "descriptive message"
-
-# Push to both remotes
-git push origin master
-git push gitea master
-```
 
