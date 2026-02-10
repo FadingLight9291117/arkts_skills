@@ -33,6 +33,35 @@ Build, package, and deploy HarmonyOS applications.
 - hdc device installation
 - Troubleshooting common errors
 
+## Quick Deploy
+
+Use [skills.sh](https://skills.sh/) to deploy skills to your project with a single command.
+
+### Install all skills
+
+```bash
+npx skills add FadingLight9291117/arkts_skills
+```
+
+### Install a single skill
+
+You can install a specific skill from this repo using the `--skill` flag:
+
+```bash
+npx skills add https://github.com/FadingLight9291117/arkts_skills --skill harmonyos-build-deploy
+npx skills add https://github.com/FadingLight9291117/arkts_skills --skill arkts-development
+```
+
+Or search for skills on [skills.sh](https://skills.sh/) and run the corresponding install command:
+
+```bash
+npx skills add <owner/repo>
+```
+
+Once installed, the skill is automatically configured for your AI agent (supports OpenCode, Cursor, Claude Code, Copilot, and other major agents).
+
+> No additional CLI installation required — `npx` downloads and runs it automatically. To disable anonymous telemetry, set the environment variable `DISABLE_TELEMETRY=1`.
+
 ## Usage
 
 These skills are automatically loaded by OpenCode when relevant tasks are detected. The AI agent uses the skill documentation to:
@@ -45,25 +74,25 @@ These skills are automatically loaded by OpenCode when relevant tasks are detect
 ## Repository Structure
 
 ```
-skills/
-├── AGENTS.md                   # Guidelines for AI agents
-├── README.md                   # This file
-├── arkts-development/
-│   ├── SKILL.md
-│   ├── assets/
-│   │   ├── component-template.ets
-│   │   └── list-page-template.ets
-│   └── references/
-│       ├── api-reference.md
-│       ├── codelinter.md
-│       ├── component-patterns.md
-│       ├── hstack.md
-│       ├── hvigor-commandline.md
-│       └── migration-guide.md
-└── harmonyos-build-deploy/
-    ├── SKILL.md
-    └── references/
-        └── device-installation.md
+AGENTS.md                       # Guidelines for AI agents
+README.md                       # This file
+arkts-development/
+├── SKILL.md
+├── assets/
+│   ├── component-template.ets
+│   └── list-page-template.ets
+└── references/
+    ├── api-reference.md
+    ├── arkguard-obfuscation.md
+    ├── codelinter.md
+    ├── component-patterns.md
+    ├── hstack.md
+    ├── hvigor-commandline.md
+    └── migration-guide.md
+harmonyos-build-deploy/
+├── SKILL.md
+└── references/
+    └── device-installation.md
 ```
 
 ## Contributing
