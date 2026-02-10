@@ -34,6 +34,8 @@ struct HelloWorld {
 
 ## State Management Decorators
 
+### V1 (Traditional)
+
 | Decorator | Usage | Description |
 |-----------|-------|-------------|
 | `@State` | `@State count: number = 0` | Component internal state |
@@ -41,6 +43,22 @@ struct HelloWorld {
 | `@Link` | `@Link value: number` | Parent ↔ Child (two-way, use `$varName`) |
 | `@Provide/@Consume` | Cross-level | Ancestor → Descendant |
 | `@Observed/@ObjectLink` | Nested objects | Deep object observation |
+
+### V2 (Recommended - API 12+)
+
+| Decorator | Usage | Description |
+|-----------|-------|-------------|
+| `@ComponentV2` | `@ComponentV2 struct MyComp` | Enable V2 state management |
+| `@Local` | `@Local count: number = 0` | Internal state (no external init) |
+| `@Param` | `@Param title: string = ""` | Parent → Child (one-way, efficient) |
+| `@Event` | `@Event onChange: () => void` | Child → Parent (callback) |
+| `@ObservedV2` | `@ObservedV2 class Data` | Class observation |
+| `@Trace` | `@Trace name: string` | Property-level tracking |
+| `@Computed` | `@Computed get value()` | Cached computed properties |
+| `@Monitor` | `@Monitor('prop') onFn()` | Watch changes with before/after |
+| `@Provider/@Consumer` | Cross-level | Two-way sync across tree |
+
+**See [references/state-management-v2.md](references/state-management-v2.md) for complete V2 guide.**
 
 ## Common Layouts
 
@@ -277,6 +295,7 @@ See [references/arkguard-obfuscation.md](references/arkguard-obfuscation.md) for
 
 ## Reference Files
 
+- **State Management V2**: [references/state-management-v2.md](references/state-management-v2.md) - Complete guide to V2 state management (@ComponentV2, @Local, @Param, @Event, @ObservedV2, @Trace, @Computed, @Monitor, @Provider, @Consumer)
 - **Migration Guide**: [references/migration-guide.md](references/migration-guide.md) - Complete TypeScript to ArkTS migration rules and examples
 - **Component Patterns**: [references/component-patterns.md](references/component-patterns.md) - Advanced component patterns and best practices
 - **API Reference**: [references/api-reference.md](references/api-reference.md) - Common HarmonyOS APIs
