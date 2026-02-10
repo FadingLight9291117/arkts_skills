@@ -1,92 +1,92 @@
-# 堆栈解析工具 (hstack)
+# Stack Trace Analysis Tool (hstack)
 
-hstack 是用于将 Release 应用混淆后的 crash 堆栈解析为源码对应堆栈的工具，支持 Windows、Mac、Linux 三个平台。
+hstack is a tool for resolving obfuscated crash stack traces from Release builds back to their original source code locations. It supports Windows, Mac, and Linux.
 
-## 命令格式
+## Command Format
 
 ```bash
 hstack [options]
 ```
 
-## 命令参数
+## Command Parameters
 
-| 参数 | 说明 |
-|------|------|
-| `-i, --input` | 指定 crash 文件归档目录 |
-| `-c, --crash` | 指定一条 crash 堆栈 |
-| `-o, --output` | 指定解析结果输出目录（使用 `-c` 时指定输出文件） |
-| `-s, --sourcemapDir` | 指定 sourcemap 文件归档目录 |
-| `--so, --soDir` | 指定 shared object (.so) 文件归档目录 |
-| `-n, --nameObfuscation` | 指定 nameCache 文件归档目录 |
-| `-v, --version` | 查看版本 |
-| `-h, --help` | 查询帮助 |
+| Parameter | Description |
+|-----------|-------------|
+| `-i, --input` | Specify the crash file archive directory |
+| `-c, --crash` | Specify a single crash stack trace |
+| `-o, --output` | Specify the output directory for parsed results (output file when using `-c`) |
+| `-s, --sourcemapDir` | Specify the sourcemap file archive directory |
+| `--so, --soDir` | Specify the shared object (.so) file archive directory |
+| `-n, --nameObfuscation` | Specify the nameCache file archive directory |
+| `-v, --version` | Show version |
+| `-h, --help` | Show help |
 
-## 参数约束
+## Parameter Constraints
 
-- crash 文件目录 (`-i`) 与 crash 堆栈 (`-c`) **必须且只能提供一项**
-- sourcemap (`-s`) 与 shared object (`--so`) 目录**至少提供一项**
-- 如需还原混淆的方法名，需**同时提供** sourcemap 和 nameCache 文件
-- 路径参数不支持特殊字符：`` `~!@#$^&*=|{};,\s\[\]<>? ``
+- Crash file directory (`-i`) and crash stack trace (`-c`) **must provide exactly one**
+- Sourcemap (`-s`) and shared object (`--so`) directories **must provide at least one**
+- To restore obfuscated method names, **both** sourcemap and nameCache files must be provided
+- Path parameters do not support special characters: `` `~!@#$^&*=|{};,\s\[\]<>? ``
 
-## 环境配置
+## Environment Setup
 
-1. 将 Command Line Tools 的 `bin` 目录配置到 PATH 环境变量
-2. 配置 Node.js 到环境变量
-3. 解析 C++ 异常需配置 SDK 的 `native\llvm\bin` 目录到环境变量 `ADDR2LINE_PATH`
+1. Add the Command Line Tools `bin` directory to the PATH environment variable
+2. Add Node.js to the environment variables
+3. To parse C++ exceptions, add the SDK's `native\llvm\bin` directory to the `ADDR2LINE_PATH` environment variable
 
-## 使用示例
+## Usage Examples
 
-### 解析 crash 文件目录
+### Parse Crash File Directory
 
 ```bash
-# 完整解析命令
+# Full parse command
 hstack -i crashDir -o outputDir -s sourcemapDir --so soDir -n nameCacheDir
 
-# 仅使用 sourcemap 解析 (ArkTS)
+# Parse using sourcemap only (ArkTS)
 hstack -i crashDir -o outputDir -s sourcemapDir
 
-# 仅使用 so 文件解析 (C++)
+# Parse using .so files only (C++)
 hstack -i crashDir -o outputDir --so soDir
 
-# 包含方法名还原
+# Include method name restoration
 hstack -i crashDir -o outputDir -s sourcemapDir -n nameCacheDir
 ```
 
-### 解析单条堆栈
+### Parse a Single Stack Trace
 
 ```bash
-# 输出到控制台
+# Output to console
 hstack -c "at har (entry|har|1.0.0|src/main/ets/pages/Index.ts:58:58)" -s sourcemapDir
 
-# 输出到文件
+# Output to file
 hstack -c "at har (entry|har|1.0.0|src/main/ets/pages/Index.ts:58:58)" -s sourcemapDir -o result.txt
 ```
 
-## 输出说明
+## Output
 
-- 解析结果输出到 `-o` 指定目录，文件以原始 crash 文件名加 `_` 前缀命名
-- 不指定 `-o` 时：
-  - 使用 `-i` 输入：输出到 crashDir 目录
-  - 使用 `-c` 输入：直接输出到控制台
+- Parsed results are written to the directory specified by `-o`, with filenames prefixed by `_` followed by the original crash filename
+- When `-o` is not specified:
+  - With `-i` input: output to the crashDir directory
+  - With `-c` input: output directly to console
 
-## 文件获取
+## File Sources
 
-### Sourcemap 文件
+### Sourcemap Files
 
-构建产物中的 sourcemap 文件，包含：
-- 路径信息映射
-- 行列号映射 (mappings 字段)
-- package-info 信息
+Sourcemap files from build artifacts, containing:
+- Path information mapping
+- Line/column number mapping (mappings field)
+- package-info information
 
-### NameCache 文件
+### NameCache Files
 
-构建产物中的 nameCache 文件，包含：
-- `IdentifierCache`: 标识符混淆映射
-- `MemberMethodCache`: 成员方法混淆映射，格式为 `"源码方法名:起始行:结束行": "混淆后方法名"`
+NameCache files from build artifacts, containing:
+- `IdentifierCache`: Identifier obfuscation mapping
+- `MemberMethodCache`: Member method obfuscation mapping, format: `"sourceMethodName:startLine:endLine": "obfuscatedMethodName"`
 
-### Shared Object (.so) 文件
+### Shared Object (.so) Files
 
-构建 Release 应用时，默认 so 文件不包含符号表。如需生成包含符号表的 so 文件，在模块 `build-profile.json5` 中配置：
+When building Release applications, .so files do not include symbol tables by default. To generate .so files with symbol tables, configure in the module's `build-profile.json5`:
 
 ```json5
 {
@@ -98,46 +98,46 @@ hstack -c "at har (entry|har|1.0.0|src/main/ets/pages/Index.ts:58:58)" -s source
 }
 ```
 
-## 堆栈解析原理
+## Stack Trace Resolution Principles
 
-### Crash 堆栈格式
+### Crash Stack Format
 
 ```
 at har (entry|har|1.0.0|src/main/ets/components/mainpage/MainPage.js:58:58)
 at i (entry|entry|1.0.0|src/main/ets/pages/Index.ts:71:71)
 ```
 
-路径格式：`引用方packageName|被引用方packageName|version|源码相对路径`
+Path format: `referrerPackageName|referredPackageName|version|sourceRelativePath`
 
-### 解析步骤
+### Resolution Steps
 
-1. **根据路径信息找到 sourcemap**
-   - 从路径 `entry|har|1.0.0|src/main/ets/...` 在 entry 模块 sourcemap 中查找对应字段
+1. **Find the sourcemap based on path information**
+   - From the path `entry|har|1.0.0|src/main/ets/...`, look up the corresponding field in the entry module's sourcemap
 
-2. **利用 sourcemap 还原路径和行列号**
-   - 根据 `sources` 和 `mappings` 字段解析
-   - 如包含 `package-info`，可进行二次解析获取更准确的源码位置
+2. **Restore path and line/column numbers using sourcemap**
+   - Parse using the `sources` and `mappings` fields
+   - If `package-info` is included, perform a secondary parse for more accurate source locations
 
-3. **利用 nameCache 还原方法名**
-   - 查找混淆后方法名对应的所有条目
-   - 根据还原后的行号范围匹配正确的源码方法名
+3. **Restore method names using nameCache**
+   - Find all entries matching the obfuscated method name
+   - Match the correct source method name based on the restored line number range
 
-### 解析示例
+### Resolution Example
 
-原始堆栈：
+Original stack trace:
 ```
 at i (entry|entry|1.0.0|src/main/ets/pages/Index.ts:71:71)
 ```
 
-还原后：
+After resolution:
 ```
 at callHarFunction (entry/src/main/ets/pages/Index.ets:25:3)
 ```
 
-## CI/CD 集成
+## CI/CD Integration
 
 ```bash
-# 自动化解析脚本示例
+# Automated parsing script example
 hstack \
   -i ./crash-logs \
   -o ./parsed-logs \
@@ -146,8 +146,8 @@ hstack \
   -n ./build/nameCache
 ```
 
-## 常见问题
+## FAQ
 
-1. **方法名未还原**: 确保同时提供 `-s` 和 `-n` 参数
-2. **C++ 堆栈未解析**: 检查 `ADDR2LINE_PATH` 环境变量配置
-3. **so 文件无符号表**: 配置 `RelWithDebInfo` 构建选项
+1. **Method names not restored**: Ensure both `-s` and `-n` parameters are provided
+2. **C++ stack traces not parsed**: Check the `ADDR2LINE_PATH` environment variable configuration
+3. **No symbol table in .so files**: Configure the `RelWithDebInfo` build option

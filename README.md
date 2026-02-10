@@ -1,4 +1,4 @@
-# AI Skills - HarmonyOS Development
+# AI Skills - HarmonyOS/ArkTS Development
 
 AI coding agent skills for HarmonyOS/ArkTS application development.
 

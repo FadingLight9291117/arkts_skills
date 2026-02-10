@@ -1,179 +1,179 @@
-# Hvigor 命令行构建工具 (hvigorw)
+# Hvigor Command-Line Build Tool (hvigorw)
 
-hvigorw 是 Hvigor 的 wrapper 包装工具，支持自动安装 Hvigor 构建工具和相关插件依赖，以及执行 Hvigor 构建命令。
+hvigorw is the Hvigor wrapper tool that supports automatic installation of the Hvigor build tool and its plugin dependencies, as well as executing Hvigor build commands.
 
-## 命令格式
+## Command Format
 
 ```bash
 hvigorw [taskNames...] <options>
 ```
 
-## 编译构建任务
+## Build Tasks
 
-| 任务 | 说明 |
-|------|------|
-| `clean` | 清理构建产物 build 目录 |
-| `assembleHap` | 构建 Hap 应用 |
-| `assembleApp` | 构建 App 应用 |
-| `assembleHsp` | 构建 Hsp 包 |
-| `assembleHar` | 构建 Har 包 |
-| `collectCoverage` | 基于打点数据生成覆盖率统计报表 |
+| Task | Description |
+|------|-------------|
+| `clean` | Clean build artifacts in the build directory |
+| `assembleHap` | Build HAP application |
+| `assembleApp` | Build APP application |
+| `assembleHsp` | Build HSP package |
+| `assembleHar` | Build HAR package |
+| `collectCoverage` | Generate coverage statistics report from instrumented data |
 
-## 常用构建参数
+## Common Build Parameters
 
-| 参数 | 说明 |
-|------|------|
-| `-p buildMode={debug\|release}` | 指定构建模式。默认：Hap/Hsp/Har 为 debug，App 为 release |
-| `-p debuggable=true/false` | 覆盖 buildOption 中的 debuggable 配置 |
-| `-p product={ProductName}` | 指定 product 进行编译，默认为 default |
-| `-p module={ModuleName}@{TargetName}` | 指定模块及 target 编译（需配合 `--mode module`） |
-| `-p ohos-test-coverage={true\|false}` | 执行测试框架代码覆盖率插桩编译 |
-| `-p parameterFile=param.json` | 设置 oh-package.json5 的参数配置文件 |
+| Parameter | Description |
+|-----------|-------------|
+| `-p buildMode={debug\|release}` | Specify build mode. Default: debug for Hap/Hsp/Har, release for App |
+| `-p debuggable=true/false` | Override the debuggable setting in buildOption |
+| `-p product={ProductName}` | Specify product for compilation, defaults to default |
+| `-p module={ModuleName}@{TargetName}` | Specify module and target for compilation (requires `--mode module`) |
+| `-p ohos-test-coverage={true\|false}` | Enable test framework code coverage instrumentation |
+| `-p parameterFile=param.json` | Set parameter configuration file for oh-package.json5 |
 
-## 构建示例
+## Build Examples
 
 ```bash
-# 清理构建产物
+# Clean build artifacts
 hvigorw clean
 
-# Debug 模式构建 Hap
+# Build HAP in debug mode
 hvigorw assembleHap -p buildMode=debug
 
-# Release 模式构建 App
+# Build APP in release mode
 hvigorw assembleApp -p buildMode=release
 
-# 构建指定 product
+# Build a specific product
 hvigorw assembleHap -p product=free
 
-# 构建指定模块
+# Build a specific module
 hvigorw assembleHap -p module=entry@default --mode module
 
-# 构建多个模块
+# Build multiple modules
 hvigorw assembleHar -p module=library1@default,library2@default --mode module
 ```
 
-## 测试命令
+## Test Commands
 
-### Instrument Test (设备测试)
+### Instrument Test (On-Device Test)
 
 ```bash
 hvigorw onDeviceTest -p module={moduleName} -p coverage={true|false} -p scope={suiteName}#{methodName}
 ```
 
-- `module`: 执行测试的模块，缺省执行所有模块
-- `coverage`: 是否生成覆盖率报告，默认 true
-- `scope`: 测试范围，格式 `{suiteName}#{methodName}` 或 `{suiteName}`
-- `ohos-debug-asan`: 是否启用 ASan 检测，默认 false (5.19.0+)
+- `module`: Module to test; omit to test all modules
+- `coverage`: Whether to generate coverage report, defaults to true
+- `scope`: Test scope, format `{suiteName}#{methodName}` or `{suiteName}`
+- `ohos-debug-asan`: Whether to enable ASan detection, defaults to false (5.19.0+)
 
-**输出路径:**
-- 覆盖率报告: `<module-path>/.test/default/outputs/ohosTest/reports`
-- 测试结果: `<project>/<module>/.test/default/intermediates/ohosTest/coverage_data/test_result.txt`
+**Output paths:**
+- Coverage report: `<module-path>/.test/default/outputs/ohosTest/reports`
+- Test results: `<project>/<module>/.test/default/intermediates/ohosTest/coverage_data/test_result.txt`
 
-### Local Test (本地测试)
+### Local Test
 
 ```bash
 hvigorw test -p module={moduleName} -p coverage={true|false} -p scope={suiteName}#{methodName}
 ```
 
-**输出路径:**
-- 覆盖率报告: `<module-path>/.test/default/outputs/test/reports`
-- 测试结果: `<project>/<module>/.test/default/intermediates/test/coverage_data/test_result.txt`
+**Output paths:**
+- Coverage report: `<module-path>/.test/default/outputs/test/reports`
+- Test results: `<project>/<module>/.test/default/intermediates/test/coverage_data/test_result.txt`
 
-## 日志级别
+## Log Levels
 
-| 参数 | 说明 |
-|------|------|
-| `-e, --error` | 设置日志级别为 error |
-| `-w, --warn` | 设置日志级别为 warn |
-| `-i, --info` | 设置日志级别为 info |
-| `-d, --debug` | 设置日志级别为 debug |
-| `--stacktrace` | 开启打印异常堆栈信息 |
+| Parameter | Description |
+|-----------|-------------|
+| `-e, --error` | Set log level to error |
+| `-w, --warn` | Set log level to warn |
+| `-i, --info` | Set log level to info |
+| `-d, --debug` | Set log level to debug |
+| `--stacktrace` | Enable exception stack trace printing |
 
-## 构建分析 (Build Analyzer)
+## Build Analyzer
 
-| 参数 | 说明 |
-|------|------|
-| `--analyze=normal` | 普通模式分析 |
-| `--analyze=advanced` | 进阶模式，更详细的任务耗时数据 |
-| `--analyze=ultrafine` | 超精细化模式，ArkTS 编译详细打点 (6.0.0+) |
-| `--analyze=false` | 不启用构建分析 |
-| `--config properties.hvigor.analyzeHtml=true` | 生成 HTML 可视化报告到 `.hvigor/report` |
+| Parameter | Description |
+|-----------|-------------|
+| `--analyze=normal` | Normal mode analysis |
+| `--analyze=advanced` | Advanced mode with detailed task timing data |
+| `--analyze=ultrafine` | Ultra-fine mode with detailed ArkTS compilation instrumentation (6.0.0+) |
+| `--analyze=false` | Disable build analysis |
+| `--config properties.hvigor.analyzeHtml=true` | Generate HTML visual report to `.hvigor/report` |
 
-## 守护进程 (Daemon)
+## Daemon
 
-| 参数 | 说明 |
-|------|------|
-| `--daemon` | 启用守护进程 |
-| `--no-daemon` | 关闭守护进程（命令行模式推荐） |
-| `--stop-daemon` | 关闭当前工程的守护进程 |
-| `--stop-daemon-all` | 关闭所有工程的守护进程 |
-| `--status-daemon` | 查询所有 Hvigor 守护进程信息 |
-| `--max-old-space-size=12345` | 设置老生代内存大小 (MB) |
-| `--max-semi-space-size=32` | 设置新生代半空间大小 (MB, 5.18.4+) |
+| Parameter | Description |
+|-----------|-------------|
+| `--daemon` | Enable daemon process |
+| `--no-daemon` | Disable daemon process (recommended for CLI mode) |
+| `--stop-daemon` | Stop the daemon for the current project |
+| `--stop-daemon-all` | Stop all project daemons |
+| `--status-daemon` | Query all Hvigor daemon process information |
+| `--max-old-space-size=12345` | Set old generation memory size (MB) |
+| `--max-semi-space-size=32` | Set new generation semi-space size (MB, 5.18.4+) |
 
-## 性能与内存优化
+## Performance and Memory Optimization
 
-| 参数 | 说明 |
-|------|------|
-| `--parallel` / `--no-parallel` | 开启/关闭并行构建（默认开启） |
-| `--incremental` / `--no-incremental` | 开启/关闭增量构建（默认开启） |
-| `--optimization-strategy=performance` | 性能优先模式，加快构建但占用更多内存 (5.19.2+) |
-| `--optimization-strategy=memory` | 内存优先模式（默认）(5.19.2+) |
+| Parameter | Description |
+|-----------|-------------|
+| `--parallel` / `--no-parallel` | Enable/disable parallel builds (enabled by default) |
+| `--incremental` / `--no-incremental` | Enable/disable incremental builds (enabled by default) |
+| `--optimization-strategy=performance` | Performance-first mode, faster builds but higher memory usage (5.19.2+) |
+| `--optimization-strategy=memory` | Memory-first mode (default) (5.19.2+) |
 
-## 公共命令
+## Utility Commands
 
-| 任务 | 说明 |
-|------|------|
-| `tasks` | 打印工程各模块包含的任务信息 |
-| `taskTree` | 打印工程各模块的任务依赖关系 |
-| `prune` | 清除 30 天未使用的缓存并删除 pnpm 未引用包 |
-| `buildInfo` | 打印 build-profile.json5 配置信息 (5.18.4+) |
+| Task | Description |
+|------|-------------|
+| `tasks` | Print task information for all project modules |
+| `taskTree` | Print task dependency graph for all project modules |
+| `prune` | Clean caches unused for 30 days and remove unreferenced pnpm packages |
+| `buildInfo` | Print build-profile.json5 configuration information (5.18.4+) |
 
-### buildInfo 扩展参数
+### buildInfo Extended Parameters
 
 ```bash
-# 打印工程级配置
+# Print project-level configuration
 hvigorw buildInfo
 
-# 打印指定模块配置
+# Print configuration for a specific module
 hvigorw buildInfo -p module=entry
 
-# 包含 buildOption 配置
+# Include buildOption configuration
 hvigorw buildInfo -p buildOption
 
-# JSON 格式输出
+# JSON format output
 hvigorw buildInfo -p json
 ```
 
-## 其他参数
+## Other Parameters
 
-| 参数 | 说明 |
-|------|------|
-| `-h, --help` | 打印帮助信息 |
-| `-v, --version` | 打印版本信息 |
-| `-s, --sync` | 同步工程信息到 `./hvigor/outputs/sync/output.json` |
-| `-m, --mode` | 指定执行目录级别 (如 `-m project`) |
-| `--type-check` | 开启 hvigorfile.ts 类型检查 |
-| `--watch` | 观察模式，用于预览和热加载 |
-| `--node-home <string>` | 指定 Node.js 路径 |
-| `--config, -c` | 指定 hvigor-config.json5 参数 |
+| Parameter | Description |
+|-----------|-------------|
+| `-h, --help` | Print help information |
+| `-v, --version` | Print version information |
+| `-s, --sync` | Sync project information to `./hvigor/outputs/sync/output.json` |
+| `-m, --mode` | Specify execution directory level (e.g., `-m project`) |
+| `--type-check` | Enable type checking for hvigorfile.ts |
+| `--watch` | Watch mode for preview and hot reload |
+| `--node-home <string>` | Specify Node.js path |
+| `--config, -c` | Specify hvigor-config.json5 parameters |
 
-## CI/CD 常用命令组合
+## CI/CD Common Command Combinations
 
 ```bash
-# 完整的 Release 构建流程
+# Full release build pipeline
 hvigorw clean && hvigorw assembleApp -p buildMode=release --no-daemon
 
-# 带构建分析的 Debug 构建
+# Debug build with build analysis
 hvigorw assembleHap -p buildMode=debug --analyze=advanced --no-daemon
 
-# 运行测试并生成覆盖率报告
+# Run tests and generate coverage report
 hvigorw onDeviceTest -p coverage=true --no-daemon
 
-# 内存受限环境构建
+# Build in memory-constrained environment
 hvigorw assembleHap --optimization-strategy=memory --no-daemon
 
-# 清理缓存
+# Clean caches
 hvigorw prune
 hvigorw --stop-daemon-all
 ```

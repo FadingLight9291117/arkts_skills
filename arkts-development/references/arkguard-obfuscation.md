@@ -1,16 +1,16 @@
-# ArkGuard 代码混淆指南
+# ArkGuard Code Obfuscation Guide
 
-ArkGuard 是 HarmonyOS 官方推荐的代码混淆工具，用于提升应用安全性，防止逆向分析。
+ArkGuard is the officially recommended code obfuscation tool for HarmonyOS, designed to enhance application security and prevent reverse engineering.
 
-## 环境要求
+## Requirements
 
-- **DevEco Studio**: 5.0.3.600 及以上版本
-- **项目模型**: 仅支持 Stage 模型
-- **生效模式**: 仅在 Release 模式下生效
+- **DevEco Studio**: Version 5.0.3.600 or above
+- **Project Model**: Stage model only
+- **Effective Mode**: Only active in Release mode
 
-## 开启混淆
+## Enabling Obfuscation
 
-在模块的 `build-profile.json5` 中配置：
+Configure in the module's `build-profile.json5`:
 
 ```json
 {
@@ -26,87 +26,87 @@ ArkGuard 是 HarmonyOS 官方推荐的代码混淆工具，用于提升应用安
 }
 ```
 
-## 混淆规则配置
+## Obfuscation Rules Configuration
 
-在项目根目录创建 `obfuscation-rules.txt`：
+Create `obfuscation-rules.txt` in the project root directory:
 
 ```text
-# 开启属性混淆
+# Enable property obfuscation
 -enable-property-obfuscation
 
-# 开启顶层作用域名称混淆
+# Enable top-level scope name obfuscation
 -enable-toplevel-obfuscation
 
-# 开启文件名混淆
+# Enable filename obfuscation
 -enable-filename-obfuscation
 
-# 开启导入导出名称混淆
+# Enable import/export name obfuscation
 -enable-export-obfuscation
 ```
 
-## 白名单配置
+## Whitelist Configuration
 
-某些名称不能混淆（如动态属性名、API 字段、数据库字段等）：
+Certain names must not be obfuscated (e.g., dynamic property names, API fields, database fields):
 
 ```text
-# 保留属性名
+# Keep property names
 -keep-property-name apiKey
 -keep-property-name userId
 -keep-property-name responseData
 
-# 保留全局名称
+# Keep global names
 -keep-global-name AppConfig
 
-# 保留文件名
+# Keep file names
 -keep-file-name MainPage
 -keep-file-name LoginPage
 ```
 
-## 配置文件说明
+## Configuration Files
 
-| 配置文件 | 作用 | 可修改 | 影响范围 |
-|---------|------|:------:|---------|
-| `obfuscation-rules.txt` | 本模块编译时的混淆规则 | ✓ | 本模块 |
-| `consumer-rules.txt` | 本模块被依赖时的混淆规则（建议仅配置保留项） | ✓ | 依赖此模块的模块 |
-| `obfuscation.txt` | HAR/HSP 构建产物，自动生成 | ✗ | 依赖模块 |
+| Config File | Purpose | Editable | Scope |
+|-------------|---------|:--------:|-------|
+| `obfuscation-rules.txt` | Obfuscation rules applied when building this module | ✓ | Current module |
+| `consumer-rules.txt` | Obfuscation rules applied when this module is used as a dependency (recommended: keep rules only) | ✓ | Modules depending on this module |
+| `obfuscation.txt` | HAR/HSP build artifact, auto-generated | ✗ | Dependent modules |
 
-## 常用混淆选项
+## Common Obfuscation Options
 
-| 选项 | 说明 |
-|------|------|
-| `-enable-property-obfuscation` | 混淆对象属性名 |
-| `-enable-toplevel-obfuscation` | 混淆顶层作用域的变量和函数名 |
-| `-enable-filename-obfuscation` | 混淆文件名 |
-| `-enable-export-obfuscation` | 混淆导入导出的名称 |
-| `-disable-obfuscation` | 临时禁用混淆（用于调试） |
+| Option | Description |
+|--------|-------------|
+| `-enable-property-obfuscation` | Obfuscate object property names |
+| `-enable-toplevel-obfuscation` | Obfuscate top-level scope variable and function names |
+| `-enable-filename-obfuscation` | Obfuscate file names |
+| `-enable-export-obfuscation` | Obfuscate import/export names |
+| `-disable-obfuscation` | Temporarily disable obfuscation (for debugging) |
 
-## 白名单选项
+## Whitelist Options
 
-| 选项 | 说明 |
-|------|------|
-| `-keep-property-name <name>` | 保留指定属性名不被混淆 |
-| `-keep-global-name <name>` | 保留指定全局名称不被混淆 |
-| `-keep-file-name <name>` | 保留指定文件名不被混淆 |
+| Option | Description |
+|--------|-------------|
+| `-keep-property-name <name>` | Preserve specified property name from obfuscation |
+| `-keep-global-name <name>` | Preserve specified global name from obfuscation |
+| `-keep-file-name <name>` | Preserve specified file name from obfuscation |
 
-## 问题排查
+## Troubleshooting
 
-### 排查步骤
+### Diagnostic Steps
 
-1. **确认是否与混淆相关**: 临时添加 `-disable-obfuscation` 禁用混淆，验证问题是否消失
-2. **定位问题字段**: 根据崩溃日志定位被混淆的关键字段
-3. **添加白名单**: 将问题字段加入 `-keep-property-name` 白名单
+1. **Confirm obfuscation is the cause**: Temporarily add `-disable-obfuscation` and check if the issue disappears
+2. **Locate the problematic field**: Identify the obfuscated field from crash logs
+3. **Add to whitelist**: Add the problematic field to the `-keep-property-name` whitelist
 
-### 常见需要保留的场景
+### Common Scenarios Requiring Whitelisting
 
-- **网络请求**: 接口传参字段名、响应数据字段名
-- **数据库操作**: 表字段名
-- **系统 API**: 系统回调参数
-- **三方库接口**: 三方库要求的字段名
+- **Network requests**: Request parameter field names, response data field names
+- **Database operations**: Table field names
+- **System APIs**: System callback parameters
+- **Third-party library interfaces**: Field names required by third-party libraries
 
-### 示例：网络请求字段保留
+### Example: Preserving Network Request Fields
 
 ```text
-# API 请求/响应字段
+# API request/response fields
 -keep-property-name code
 -keep-property-name message
 -keep-property-name data
@@ -114,13 +114,13 @@ ArkGuard 是 HarmonyOS 官方推荐的代码混淆工具，用于提升应用安
 -keep-property-name userId
 ```
 
-## 验证混淆效果
+## Verifying Obfuscation Results
 
-1. 切换到 **Release** 模式编译
-2. 检查构建产物
-3. 使用反编译工具验证类名/方法名/属性名是否已混淆
-4. 测试应用功能是否正常
+1. Switch to **Release** mode and build
+2. Inspect the build artifacts
+3. Use decompilation tools to verify that class/method/property names are obfuscated
+4. Test that the application functions correctly
 
-## 参考
+## References
 
-- [华为官方文档 - ArkGuard](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkts-arkguard)
+- [Huawei Official Documentation - ArkGuard](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkts-arkguard)

@@ -1,103 +1,103 @@
-# CodeLinter 代码检查工具
+# CodeLinter Code Analysis Tool
 
-codelinter 是 HarmonyOS 的代码检查与修复工具，可集成到门禁或 CI/CD 环境中。
+codelinter is a code analysis and auto-fix tool for HarmonyOS, suitable for integration into gating checks or CI/CD pipelines.
 
-## 命令格式
+## Command Format
 
 ```bash
 codelinter [options] [dir]
 ```
 
-- `options`: 可选配置参数
-- `dir`: 待检查的工程根目录（可选，默认为当前目录）
+- `options`: Optional configuration parameters
+- `dir`: Project root directory to check (optional, defaults to current directory)
 
-## 命令参数
+## Command Parameters
 
-| 参数 | 说明 |
-|------|------|
-| `--config, -c <filepath>` | 指定规则配置文件 (code-linter.json5) |
-| `--fix` | 检查同时执行自动修复 |
-| `--format, -f <format>` | 输出格式: `default`/`json`/`xml`/`html` |
-| `--output, -o <filepath>` | 指定结果保存位置（不在命令行显示） |
-| `--version, -v` | 查看版本 |
-| `--product, -p <productName>` | 指定生效的 product |
-| `--incremental, -i` | 仅检查 Git 增量文件（新增/修改/重命名） |
-| `--help, -h` | 查询帮助 |
-| `--exit-on, -e <levels>` | 指定返回非零退出码的告警级别 |
+| Parameter | Description |
+|-----------|-------------|
+| `--config, -c <filepath>` | Specify rule configuration file (code-linter.json5) |
+| `--fix` | Check and apply auto-fixes simultaneously |
+| `--format, -f <format>` | Output format: `default`/`json`/`xml`/`html` |
+| `--output, -o <filepath>` | Specify output file path (suppresses console output) |
+| `--version, -v` | Show version |
+| `--product, -p <productName>` | Specify the active product |
+| `--incremental, -i` | Check only Git incremental files (added/modified/renamed) |
+| `--help, -h` | Show help |
+| `--exit-on, -e <levels>` | Specify warning levels that trigger a non-zero exit code |
 
-## 基本用法
+## Basic Usage
 
-### 在工程根目录下执行
+### Run in the Project Root Directory
 
 ```bash
-# 使用默认规则检查当前工程
+# Check current project with default rules
 codelinter
 
-# 指定规则配置文件
+# Specify a rule configuration file
 codelinter -c ./code-linter.json5
 
-# 检查并自动修复
+# Check and apply auto-fixes
 codelinter -c ./code-linter.json5 --fix
 ```
 
-### 在非工程目录下执行
+### Run Outside the Project Directory
 
 ```bash
-# 检查指定工程目录
+# Check a specific project directory
 codelinter /path/to/project
 
-# 检查多个目录或文件
+# Check multiple directories or files
 codelinter dir1 dir2 file1.ets
 
-# 指定规则文件和工程目录
+# Specify rule file and project directory
 codelinter -c /path/to/code-linter.json5 /path/to/project
 
-# 检查并修复指定工程
+# Check and fix a specific project
 codelinter -c ./code-linter.json5 /path/to/project --fix
 ```
 
-## 输出格式
+## Output Formats
 
 ```bash
-# 默认文本格式输出到命令行
+# Default text format to console
 codelinter /path/to/project
 
-# JSON 格式输出
+# JSON format output
 codelinter /path/to/project -f json
 
-# HTML 格式保存到文件
+# HTML format saved to file
 codelinter /path/to/project -f html -o ./report.html
 
-# XML 格式保存到文件
+# XML format saved to file
 codelinter /path/to/project -f xml -o ./report.xml
 ```
 
-## 增量检查
+## Incremental Checking
 
-对 Git 工程中的增量文件执行检查（仅检查新增、修改、重命名的文件）：
+Check only incremental files in a Git project (only added, modified, or renamed files):
 
 ```bash
 codelinter -i
 codelinter --incremental
 ```
 
-## 指定 Product
+## Specifying a Product
 
-当工程存在多个 product 时，指定生效的 product：
+When the project has multiple products, specify the active product:
 
 ```bash
 codelinter -p free /path/to/project
 codelinter --product default
 ```
 
-## 退出码 (--exit-on)
+## Exit Codes (--exit-on)
 
-用于 CI/CD 中根据告警级别控制流程。告警级别：`error`、`warn`、`suggestion`
+Used in CI/CD to control the pipeline based on warning levels. Warning levels: `error`, `warn`, `suggestion`
 
-退出码计算方式（3位二进制数，从高到低表示 error, warn, suggestion）：
+Exit code calculation (3-bit binary number, from high to low representing error, warn, suggestion):
 
-| 配置 | 检查结果包含 | 二进制 | 退出码 |
-|------|-------------|--------|--------|
+| Configuration | Check Results Include | Binary | Exit Code |
+|---------------|---------------------|--------|-----------|
 | `--exit-on error` | error, warn, suggestion | 100 | 4 |
 | `--exit-on error` | warn, suggestion | 000 | 0 |
 | `--exit-on error,warn` | error, warn | 110 | 6 |
@@ -105,40 +105,40 @@ codelinter --product default
 | `--exit-on error,warn,suggestion` | error, warn, suggestion | 111 | 7 |
 
 ```bash
-# 仅 error 级别返回非零退出码
+# Non-zero exit code only for error level
 codelinter --exit-on error
 
-# error 和 warn 级别返回非零退出码
+# Non-zero exit code for error and warn levels
 codelinter --exit-on error,warn
 
-# 所有级别都返回非零退出码
+# Non-zero exit code for all levels
 codelinter --exit-on error,warn,suggestion
 ```
 
-## CI/CD 集成示例
+## CI/CD Integration Examples
 
 ```bash
-# 完整的 CI 检查流程
+# Full CI check pipeline
 codelinter -c ./code-linter.json5 \
   -f json \
   -o ./codelinter-report.json \
   --exit-on error,warn
 
-# 增量检查（仅检查变更文件）
+# Incremental check (changed files only)
 codelinter -i -c ./code-linter.json5 --exit-on error
 
-# 检查并自动修复，生成 HTML 报告
+# Check with auto-fix, generate HTML report
 codelinter -c ./code-linter.json5 \
   --fix \
   -f html \
   -o ./codelinter-report.html
 ```
 
-## 规则配置文件 (code-linter.json5)
+## Rule Configuration File (code-linter.json5)
 
-默认规则清单可在检查完成后，根据命令行提示查看生成的 `code-linter.json5` 文件。
+The default rule list can be viewed in the generated `code-linter.json5` file, as indicated by the console output after a check completes.
 
-示例配置：
+Example configuration:
 
 ```json5
 {
