@@ -18,10 +18,11 @@ ArkTS/ArkUI development for HarmonyOS applications.
 
 **Covers:**
 - ArkUI declarative UI framework
-- State management decorators (@State, @Prop, @Link)
+- State management V1 (@State, @Prop, @Link) and V2 (@Local, @Param, @Event, @ObservedV2, @Trace)
 - Component lifecycle and navigation
 - Network requests and local storage
 - TypeScript to ArkTS migration
+- Code obfuscation, linting, and debugging tools
 
 ### harmonyos-build-deploy
 
@@ -80,7 +81,8 @@ arkts-development/
 ├── SKILL.md
 ├── assets/
 │   ├── component-template.ets
-│   └── list-page-template.ets
+│   ├── list-page-template.ets
+│   └── state-management-v2-examples.ets
 └── references/
     ├── api-reference.md
     ├── arkguard-obfuscation.md
@@ -88,7 +90,8 @@ arkts-development/
     ├── component-patterns.md
     ├── hstack.md
     ├── hvigor-commandline.md
-    └── migration-guide.md
+    ├── migration-guide.md
+    └── state-management-v2.md
 harmonyos-build-deploy/
 ├── SKILL.md
 └── references/
