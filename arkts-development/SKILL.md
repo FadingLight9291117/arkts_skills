@@ -96,7 +96,11 @@ router.replaceUrl({ url: 'pages/New' });
 router.back();
 
 // Get params
-const params = router.getParams() as Record<string, Object>;
+interface RouteParams {
+  id: number;
+  title?: string;
+}
+const params = router.getParams() as RouteParams;
 ```
 
 ## Network Request

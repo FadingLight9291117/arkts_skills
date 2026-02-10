@@ -28,6 +28,9 @@ struct {{PageName}} {
         { id: '1', title: 'Item 1', description: 'Description 1' },
         { id: '2', title: 'Item 2', description: 'Description 2' },
       ];
+    } catch (error) {
+      console.error('Failed to load items:', error);
+      // TODO: Show error message to user
     } finally {
       this.isLoading = false;
     }

@@ -70,17 +70,24 @@ router.back({
   url: 'pages/HomePage',
   params: { result: 'success' }
 });
+// Note: Previous page receives params via router.getParams()
 ```
 
 ### Get Parameters
 
 ```typescript
+// Define expected params interface
+interface PageParams {
+  id: number;
+  title?: string;
+}
+
 // In target page
 aboutToAppear(): void {
-  const params = router.getParams() as Record<string, Object>;
+  const params = router.getParams() as PageParams;
   if (params) {
-    const id = params['id'] as number;
-    const title = params['title'] as string;
+    const id = params.id;
+    const title = params.title;
   }
 }
 ```
