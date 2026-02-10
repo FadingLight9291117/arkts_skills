@@ -222,5 +222,6 @@ When making changes, follow this checklist:
 2. **Check**: Did I add/remove files? → Update file tree in README
 3. **Check**: Did I add new functionality? → Update "Covers" section in README
 4. Update README.md if needed
+5. **ALWAYS** update CHANGELOG.md with a summary of changes for every commit
 
 
