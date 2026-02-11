@@ -118,7 +118,7 @@ Build only a specific module for faster iteration:
 hvigorw assembleHap -p module=entry@default --mode module -p buildMode=release --no-daemon
 
 # Build single HSP module
-hvigorw assembleHsp -p module=feature_module@default --mode module -p buildMode=release --no-daemon
+hvigorw assembleHsp -p module=my_feature@default --mode module -p buildMode=release --no-daemon
 
 # Build single HAR module
 hvigorw assembleHar -p module=library@default --mode module -p buildMode=release --no-daemon
@@ -128,7 +128,7 @@ hvigorw assembleHsp -p module=module1@default,module2@default --mode module -p b
 ```
 
 **Module name format:** `{moduleName}@{targetName}`
-- `moduleName`: Directory name of the module (e.g., `entry`, `feature_home`)
+- `moduleName`: Directory name of the module (e.g., `entry`, `my_feature`)
 - `targetName`: Target defined in module's `build-profile.json5` (usually `default`)
 
 **When to use single module build:**

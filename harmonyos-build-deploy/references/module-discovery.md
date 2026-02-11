@@ -22,8 +22,8 @@ All modules are defined in `build-profile.json5` at the project root, in the `mo
       ]
     },
     {
-      "name": "support_http",
-      "srcPath": "./support/support_http",
+      "name": "my_library",
+      "srcPath": "./library/my_library",
       "targets": [...]
     }
   ]
@@ -89,15 +89,15 @@ Module build outputs are located at:
 
 ### Example
 
-For module `support_http` with `srcPath: "./support/support_http"`:
+For module `my_library` with `srcPath: "./library/my_library"`:
 
 ```
-support/support_http/build/default/outputs/default/
-├── support_http-default-signed.hsp    ← Signed, ready to install
-├── support_http-default-unsigned.hsp
-├── support_http.har
+library/my_library/build/default/outputs/default/
+├── my_library-default-signed.hsp    ← Signed, ready to install
+├── my_library-default-unsigned.hsp
+├── my_library.har
 ├── app/
-│   └── support_http-default.hsp
+│   └── my_library-default.hsp
 ├── mapping/
 │   └── sourceMaps.map
 └── pack.info
