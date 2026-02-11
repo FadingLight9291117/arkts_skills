@@ -57,31 +57,16 @@ Delegate to subagent with the following steps:
 1. Clean: `hvigorw clean --no-daemon`
 2. Install dependencies: `ohpm install --all`
 3. Build: `hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon`
-4. Build output is at `outputs/default/bundles/signed/`
-5. Deploy to device:
-   ```bash
-   INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
-   hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
-   hdc -t <UDID> file send outputs/default/bundles/signed $INSTALL_DIR
-   hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
-   hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
-   ```
-6. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
-7. Report success/failure with details
+4. Deploy to device (see [Push and Install](#push-and-install) below)
+5. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
+6. Report success/failure with details
 
 ### Deploy Only (No Rebuild)
 
 Delegate to subagent with the following steps:
 
 1. Read `AppScope/app.json5` to get bundleName
-2. Push existing build output to device:
-   ```bash
-   INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
-   hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
-   hdc -t <UDID> file send outputs/default/bundles/signed $INSTALL_DIR
-   hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
-   hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
-   ```
+2. Deploy to device (see [Push and Install](#push-and-install) below)
 3. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
 4. Report success/failure with details
 
@@ -168,15 +153,6 @@ Only needed after modifying `build-profile.json5` or `oh-package.json5`:
 
 ```bash
 hvigorw --sync -p product=default -p buildMode=release --no-daemon
-```
-
-### Build Types
-
-```bash
-hvigorw assembleHap    # Build HAP (Harmony Ability Package)
-hvigorw assembleHsp    # Build HSP (Harmony Shared Package)
-hvigorw assembleHar    # Build HAR (Harmony Archive)
-hvigorw assembleApp    # Build complete APP bundle
 ```
 
 ### Build Parameters
@@ -308,11 +284,11 @@ Run via `hdc -t <UDID> shell "aa ..."`:
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `version code not same` | HSP in output not in build-profile.json5 | Remove unwanted HSP files before install |
-| `install parse profile prop check error` | Signature/profile mismatch | Check signing config in build-profile.json5 |
+| `version code not same` | HSP in output not in build-profile.json5 | Remove unwanted HSP files before install (see [module-discovery.md](references/module-discovery.md)) |
+| `install parse profile prop check error` | Signature/profile mismatch | Check signing config in build-profile.json5; verify bundleName matches app.json5; check certificate not expired |
 | `install failed due to older sdk version` | Device SDK < app's compatibleSdkVersion | Update device or lower compatibleSdkVersion |
-| Device not found | Connection issue | Check USB, enable debugging, `hdc kill && hdc start` |
-| `signature verification failed` | Invalid or expired certificate | Regenerate signing certificate |
+| Device not found | Connection issue | Check USB; enable Developer Options (tap build number 7x) and USB debugging; `hdc kill && hdc start`; try different USB port/cable |
+| `signature verification failed` | Invalid or expired certificate | Regenerate certificate in DevEco Studio; check validity period; ensure correct signing config for build type |
 
 ## Key Configuration Files
 
@@ -326,7 +302,7 @@ Run via `hdc -t <UDID> shell "aa ..."`:
 ## Reference Files
 
 - **Module Discovery & Build Outputs**: [references/module-discovery.md](references/module-discovery.md) - Module definitions, type identification, build output paths, unwanted modules
-- **Complete Installation Guide**: [references/device-installation.md](references/device-installation.md) - Detailed troubleshooting, version verification scripts, and installation script
+- **Complete Installation Guide**: [references/device-installation.md](references/device-installation.md) - Version verification scripts and installation script
 
 ## Related Skills
 

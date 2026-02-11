@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **harmonyos-build-deploy**: Translated Chinese UI strings to English in SKILL.md
 - **harmonyos-build-deploy**: Removed agent-framework coupling (question() tool, Task() subagent references) — workflows are now framework-agnostic but marked for subagent delegation
-- **harmonyos-build-deploy**: Deduplicated content between SKILL.md and device-installation.md — reference file now focuses on version verification, install script, and detailed troubleshooting
+- **harmonyos-build-deploy**: Deduplicated content between SKILL.md and device-installation.md — reference file now focuses on version verification and install script
 - **harmonyos-build-deploy**: Fixed module type identification — now uses `module.json5` `type` field instead of heuristic based on `targets` presence
 - **harmonyos-build-deploy**: Extracted module discovery, build outputs, and unwanted modules into `references/module-discovery.md` (~138 lines moved out of SKILL.md)
 - **harmonyos-build-deploy**: Fixed unquoted variable in install.sh script
@@ -20,7 +20,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **harmonyos-build-deploy**: Wireless debugging (hdc tconn) section — environment setup, not build/deploy
 - **harmonyos-build-deploy**: Restart App workflow — runtime operation, not build/deploy
 - **harmonyos-build-deploy**: `aa dump -a` command — runtime debugging, not build/deploy
-- **harmonyos-build-deploy**: Duplicate Build Output Structure from device-installation.md (already in SKILL.md and module-discovery.md)
+- **harmonyos-build-deploy**: Build Types section — redundant with Single Module Build and Module Types table
+- **harmonyos-build-deploy**: Duplicate installation workflow and troubleshooting from device-installation.md (consolidated into SKILL.md)
 
 ### Added
 

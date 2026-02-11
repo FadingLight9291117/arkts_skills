@@ -1,6 +1,6 @@
 # Device Installation Guide
 
-Detailed guide for packaging and installing HarmonyOS applications to physical devices. This supplements the main [SKILL.md](../SKILL.md) with deeper troubleshooting, version verification, and an installation script.
+Detailed guide for verifying build outputs and automating device installation. This supplements the main [SKILL.md](../SKILL.md) with version verification scripts and an installation script.
 
 ## Prerequisites
 
@@ -41,54 +41,6 @@ A module should be removed from the output before installation if:
 
 ```bash
 rm outputs/default/bundles/signed/problematic-module-default-signed.hsp
-```
-
-## Complete Installation Workflow
-
-### Step 1: Check Device Connection
-
-```bash
-hdc list targets
-# Output: device UDID (e.g., 1234567890ABCDEF)
-```
-
-If no device found:
-1. Check USB connection
-2. Enable Developer Options on device: Settings > About > Tap build number 7 times
-3. Enable USB debugging: Settings > Developer options > USB debugging
-4. Run `hdc kill && hdc start` to restart hdc server
-
-### Step 2: Push Files to Device
-
-```bash
-# Create random temp directory on device
-INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
-hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
-
-# Push signed HAP/HSP files
-hdc -t <UDID> file send outputs/default/bundles/signed $INSTALL_DIR
-```
-
-### Step 3: Install Application
-
-```bash
-# Install all HAP/HSP from directory
-hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
-
-# Expected output: "install bundle successfully."
-
-# Clean up temp directory
-hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
-```
-
-### Step 4: Verify and Launch
-
-```bash
-# Check package info
-hdc -t <UDID> shell "bm dump -n <bundleName>"
-
-# Launch application
-hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"
 ```
 
 ## Quick Installation Script
@@ -151,52 +103,3 @@ Usage:
 # Specify device, path, and bundle name (auto-launch)
 ./install.sh 1234567890ABCDEF outputs/default/bundles/signed com.example.app
 ```
-
-## Troubleshooting Details
-
-### Error: "version code not same"
-
-**Cause:** Some HAP/HSP modules have different versionCode than others.
-
-**Solution:**
-1. Use the version check commands above to find modules with different versionCode
-2. Remove those modules from signed directory before installation
-3. Usually caused by precompiled modules not in build-profile.json5
-
-### Error: "install parse profile prop check error"
-
-**Cause:** Signature or profile configuration mismatch.
-
-**Solution:**
-1. Check signing config in `build-profile.json5`
-2. Ensure certificate and profile match
-3. Verify profile bundleName matches app.json5 bundleName
-4. Check certificate is not expired
-
-### Error: Device not found
-
-**Cause:** Connection or hdc service issue.
-
-**Solution:**
-1. Check USB cable connection
-2. Enable Developer Options: Settings > About > Tap build number 7 times
-3. Enable USB debugging: Settings > Developer options > USB debugging
-4. Restart hdc server: `hdc kill && hdc start`
-5. Try different USB port or cable
-
-### Error: "install failed due to older sdk version in the device"
-
-**Cause:** Device system version is lower than app's minimum requirement.
-
-**Solution:**
-1. Update device to latest system version
-2. Or lower `compatibleSdkVersion` in `build-profile.json5`
-
-### Error: "signature verification failed"
-
-**Cause:** Certificate issues.
-
-**Solution:**
-1. Regenerate debug/release certificate in DevEco Studio
-2. Check certificate validity period
-3. Ensure using correct signing config for build type
