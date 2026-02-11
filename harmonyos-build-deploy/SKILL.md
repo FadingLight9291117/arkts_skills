@@ -49,56 +49,54 @@ Check your project's actual output after build.
 
 ## Workflows
 
+**IMPORTANT:** Build, clean, and deploy operations are long-running (build ~30s, file transfer ~20s). Always delegate these workflows to a **subagent** to avoid timeout. This also provides better error handling and clearer progress reporting to the user.
+
 ### Clean Build & Deploy
 
-```bash
-# 1. Clean
-hvigorw clean --no-daemon
+Delegate to subagent with the following steps:
 
-# 2. Install dependencies
-ohpm install --all
-
-# 3. Build
-hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon
-
-# 4. Find build output (check outputs/default/signed/ or outputs/project/bundles/signed/)
-
-# 5. Deploy to device
-hdc -t <UDID> shell "rm -rf /data/local/tmp/install && mkdir -p /data/local/tmp/install"
-hdc -t <UDID> file send <output_path>/signed /data/local/tmp/install
-hdc -t <UDID> shell "bm install -p /data/local/tmp/install/signed"
-
-# 6. Launch
-hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"
-```
+1. Clean: `hvigorw clean --no-daemon`
+2. Install dependencies: `ohpm install --all`
+3. Build: `hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon`
+4. Find build output (check `outputs/default/signed/` or `outputs/project/bundles/signed/`)
+5. Deploy to device:
+   ```bash
+   hdc -t <UDID> shell "rm -rf /data/local/tmp/install && mkdir -p /data/local/tmp/install"
+   hdc -t <UDID> file send <output_path>/signed /data/local/tmp/install
+   hdc -t <UDID> shell "bm install -p /data/local/tmp/install/signed"
+   ```
+6. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
+7. Report success/failure with details
 
 ### Deploy Only (No Rebuild)
 
-```bash
-# 1. Read AppScope/app.json5 to get bundleName
+Delegate to subagent with the following steps:
 
-# 2. Push existing build output to device
-hdc -t <UDID> shell "rm -rf /data/local/tmp/install && mkdir -p /data/local/tmp/install"
-hdc -t <UDID> file send <output_path>/signed /data/local/tmp/install
-hdc -t <UDID> shell "bm install -p /data/local/tmp/install/signed"
-
-# 3. Launch
-hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"
-```
+1. Read `AppScope/app.json5` to get bundleName
+2. Push existing build output to device:
+   ```bash
+   hdc -t <UDID> shell "rm -rf /data/local/tmp/install && mkdir -p /data/local/tmp/install"
+   hdc -t <UDID> file send <output_path>/signed /data/local/tmp/install
+   hdc -t <UDID> shell "bm install -p /data/local/tmp/install/signed"
+   ```
+3. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
+4. Report success/failure with details
 
 ### Restart App
 
-```bash
-hdc -t <UDID> shell "aa force-stop <bundleName>"
-hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"
-```
+Delegate to subagent:
+
+1. Force stop: `hdc -t <UDID> shell "aa force-stop <bundleName>"`
+2. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
+3. Report success/failure
 
 ### Clean App Cache/Data
 
-```bash
-hdc -t <UDID> shell "bm clean -n <bundleName> -c"   # Clean cache
-hdc -t <UDID> shell "bm clean -n <bundleName> -d"   # Clean data
-```
+Delegate to subagent:
+
+1. Clean cache: `hdc -t <UDID> shell "bm clean -n <bundleName> -c"`
+2. Clean data: `hdc -t <UDID> shell "bm clean -n <bundleName> -d"`
+3. Report success/failure
 
 ## Build Commands (hvigorw)
 
