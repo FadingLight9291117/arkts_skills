@@ -94,7 +94,8 @@ arkts-development/
 harmonyos-build-deploy/
 ├── SKILL.md
 └── references/
-    └── device-installation.md
+    ├── device-installation.md
+    └── module-discovery.md
 ```
 
 ## Contributing
