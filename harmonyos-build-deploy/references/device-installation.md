@@ -2,6 +2,8 @@
 
 Detailed guide for verifying build outputs and automating device installation. This supplements the main [SKILL.md](../SKILL.md) with version verification scripts and an installation script.
 
+**Note:** All device paths use `//` prefix for Git Bash compatibility on Windows.
+
 ## Prerequisites
 
 - **hdc**: HarmonyOS Device Connector (included in HarmonyOS SDK)
@@ -45,7 +47,7 @@ rm outputs/problematic-module-default-signed.hsp
 
 ## Quick Installation Script
 
-Save as `install.sh` (Linux/macOS) or run with Git Bash on Windows:
+Save as `install.sh` (Linux/macOS/Git Bash):
 
 ```bash
 #!/bin/bash
@@ -54,7 +56,7 @@ Save as `install.sh` (Linux/macOS) or run with Git Bash on Windows:
 DEVICE_ID="${1:-$(hdc list targets | head -1)}"
 SIGNED_PATH="${2:-outputs}"
 BUNDLE_NAME="${3:-}"
-REMOTE_PATH="/data/local/tmp/install_$(date +%s)"
+REMOTE_PATH="//data/local/tmp/install_$(date +%s)"
 
 if [ -z "$DEVICE_ID" ]; then
     echo "Error: No device found. Connect a device or specify UDID as first argument."

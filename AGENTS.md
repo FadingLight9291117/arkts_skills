@@ -60,10 +60,12 @@ codelinter -f json -o report.json            # JSON report
 
 ### Device (hdc)
 
+**Note:** Device paths use `//` prefix for Git Bash compatibility on Windows.
+
 ```bash
-hdc list targets                                        # List devices (returns UDID)
-hdc -t <UDID> file send <local_path> <device_path>     # Push files
-hdc -t <UDID> shell "bm install -p <dir>"              # Install app
+hdc list targets                                            # List devices (returns UDID)
+hdc -t <UDID> file send <local_path> "//data/local/tmp"    # Push files (note // prefix)
+hdc -t <UDID> shell "bm install -p //data/local/tmp"       # Install app
 hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"  # Launch app
 ```
 

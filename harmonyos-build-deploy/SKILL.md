@@ -35,13 +35,12 @@ Complete workflow for building, cleaning, packaging, and installing HarmonyOS ap
 # Build complete app (incremental)
 hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon
 
-# Install to device
-# Use a random directory name to avoid conflicts with previous installations
-INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
+# Install to device (Git Bash compatible)
+INSTALL_DIR="//data/local/tmp/install_$(date +%s)"
 hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
 # Only push .hap and .hsp files
 for f in outputs/*.hap outputs/*.hsp; do
-    [ -f "$f" ] && hdc -t <UDID> file send "$f" $INSTALL_DIR/
+    [ -f "$f" ] && hdc -t <UDID> file send "$f" "$INSTALL_DIR/"
 done
 hdc -t <UDID> shell "bm install -p $INSTALL_DIR"
 hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
@@ -218,13 +217,13 @@ hdc -t <UDID> shell "whoami"  # Test connection
 ### Push and Install
 
 ```bash
-# Create random temp directory on device
-INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
+# Create temp directory on device (Git Bash compatible)
+INSTALL_DIR="//data/local/tmp/install_$(date +%s)"
 hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
 
 # Only push .hap and .hsp files
 for f in outputs/*.hap outputs/*.hsp; do
-    [ -f "$f" ] && hdc -t <UDID> file send "$f" $INSTALL_DIR/
+    [ -f "$f" ] && hdc -t <UDID> file send "$f" "$INSTALL_DIR/"
 done
 
 # Install all HAP/HSP in directory
