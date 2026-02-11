@@ -1,6 +1,6 @@
 # AI Agent Skills - HarmonyOS/ArkTS Development
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](CHANGELOG.md)
 
 AI coding agent skills for HarmonyOS/ArkTS application development.
 
