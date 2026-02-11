@@ -7,30 +7,19 @@ description: HarmonyOS application build, clean, package and device installation
 
 Complete workflow for building, cleaning, packaging, and installing HarmonyOS applications.
 
-## First Step: Ask User for Operation
+## First Step: Confirm Operation with User
 
-**IMPORTANT:** Before executing any build or deploy operation, you MUST first ask the user which specific operation(s) they want to perform using the `question` tool.
+**IMPORTANT:** Before executing any build or deploy operation, confirm which specific operation(s) the user wants to perform. Ask the user to choose from:
 
-Use the following question configuration:
+| Operation | Description |
+|-----------|-------------|
+| Clean build artifacts | Remove previous build cache and outputs |
+| Install dependencies | Use ohpm to install project dependencies |
+| Build project | Use hvigorw to build HAP/APP packages |
+| Install to device | Use hdc to install the app on a device |
+| Full pipeline | Clean → install deps → build → deploy to device |
 
-```javascript
-question({
-  questions: [{
-    header: "选择操作",
-    multiple: true,
-    question: "您想要执行哪些构建部署操作？",
-    options: [
-      { label: "清理构建产物", description: "清理之前的构建缓存和产物" },
-      { label: "安装依赖", description: "使用 ohpm 安装项目依赖" },
-      { label: "构建项目", description: "使用 hvigorw 构建 HAP/APP 包" },
-      { label: "安装到设备", description: "使用 hdc 将应用安装到设备" },
-      { label: "完整流程", description: "依次执行清理、安装依赖、构建、部署到设备" }
-    ]
-  }]
-})
-```
-
-**Why ask first:**
+**Why confirm first:**
 - Different scenarios require different operations (e.g., incremental build vs clean build)
 - Avoid unnecessary time-consuming operations
 - Give user control over the workflow
@@ -38,15 +27,11 @@ question({
 
 **After user responds:**
 - Execute only the selected operations
-- Use the subagent Task tool for time-consuming operations (build, deploy)
 - Report progress and results clearly
 
 ## Quick Reference
 
 ```bash
-# For time-consuming operations (build, deploy), use subagent Task tool
-# See "Workflow with Subagent" section below for details
-
 # Build complete app (incremental)
 hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon
 
@@ -62,68 +47,58 @@ hdc -t <UDID> shell "bm install -p /data/local/tmp/install/signed"
 
 Check your project's actual output after build.
 
-## Workflow with Subagent
-
-For time-consuming operations (build, clean, deploy), use the **general** subagent to handle the entire workflow:
+## Workflows
 
 ### Clean Build & Deploy
 
 ```bash
-# Launch subagent to clean, build, and deploy to device
-Task(description="Clean build and deploy", prompt="Clean build and deploy the HarmonyOS app to device.
+# 1. Clean
+hvigorw clean --no-daemon
 
-1. Run: hvigorw clean --no-daemon
-2. Run: ohpm install --all
-3. Run: hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon
-4. Find the build output directory (outputs/project/ or outputs/default/)
-5. Deploy to device using hdc commands:
-   - Clean device temp: hdc -t <UDID> shell \"rm -rf /data/local/tmp/install && mkdir -p /data/local/tmp/install\"
-   - Send files: hdc -t <UDID> file send <output_path> /data/local/tmp/install/
-   - Install: hdc -t <UDID> shell \"bm install -p /data/local/tmp/install/project/bundles/signed\"
-   - Launch: hdc -t <UDID> shell \"aa start -a EntryAbility -b <bundleName>\"
-6. Report success/failure with details.", subagent_type="general")
+# 2. Install dependencies
+ohpm install --all
+
+# 3. Build
+hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon
+
+# 4. Find build output (check outputs/default/signed/ or outputs/project/bundles/signed/)
+
+# 5. Deploy to device
+hdc -t <UDID> shell "rm -rf /data/local/tmp/install && mkdir -p /data/local/tmp/install"
+hdc -t <UDID> file send <output_path>/signed /data/local/tmp/install
+hdc -t <UDID> shell "bm install -p /data/local/tmp/install/signed"
+
+# 6. Launch
+hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"
 ```
 
 ### Deploy Only (No Rebuild)
 
 ```bash
-# Launch subagent to deploy existing build to device
-Task(description="Deploy app to device", prompt="Deploy the HarmonyOS application to device <UDID>.
+# 1. Read AppScope/app.json5 to get bundleName
 
-1. Read AppScope/app.json5 to get bundleName
-2. Clean device temp: hdc -t <UDID> shell \"rm -rf /data/local/tmp/install && mkdir -p /data/local/tmp/install\"
-3. Send build output to device: hdc -t <UDID> file send \"<output_path>/project/\" \"/data/local/tmp/install/\"
-4. Install: hdc -t <UDID> shell \"bm install -p /data/local/tmp/install/project/bundles/signed\"
-5. Launch: hdc -t <UDID> shell \"aa start -a EntryAbility -b <bundleName>\"
-6. Report success/failure with details.", subagent_type="general")
+# 2. Push existing build output to device
+hdc -t <UDID> shell "rm -rf /data/local/tmp/install && mkdir -p /data/local/tmp/install"
+hdc -t <UDID> file send <output_path>/signed /data/local/tmp/install
+hdc -t <UDID> shell "bm install -p /data/local/tmp/install/signed"
+
+# 3. Launch
+hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"
 ```
 
 ### Restart App
 
 ```bash
-# Launch subagent to restart the app
-Task(description="Restart app", prompt="Restart the HarmonyOS app on device <UDID>.
-
-1. Force stop: hdc -t <UDID> shell \"aa force-stop <bundleName>\"
-2. Launch: hdc -t <UDID> shell \"aa start -a EntryAbility -b <bundleName>\"
-3. Report success/failure.", subagent_type="general")
+hdc -t <UDID> shell "aa force-stop <bundleName>"
+hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"
 ```
 
 ### Clean App Cache/Data
 
 ```bash
-# Launch subagent to clean app data
-Task(description="Clean app data", prompt="Clean app data on device <UDID>.
-
-1. Clean cache: hdc -t <UDID> shell \"bm clean -n <bundleName> -c\"
-2. Clean data: hdc -t <UDID> shell \"bm clean -n <bundleName> -d\"
-3. Report success/failure.", subagent_type="general")
+hdc -t <UDID> shell "bm clean -n <bundleName> -c"   # Clean cache
+hdc -t <UDID> shell "bm clean -n <bundleName> -d"   # Clean data
 ```
-
-**Why use subagent?**
-- Long-running operations (build ~30s, file transfer ~20s) don't timeout
-- Better error handling and reporting
-- User gets clear progress updates
 
 ## Build Commands (hvigorw)
 
@@ -286,20 +261,31 @@ All modules are defined in `build-profile.json5` at the project root, in the `mo
 
 ### Module Type Identification
 
-| Characteristic | Module Type |
-|----------------|-------------|
-| Has `targets` and `name` is `entry` | **HAP** (Application entry) |
-| Has `targets` config | **HSP** (Dynamic shared package) |
-| No `targets` config | **HAR** (Static library, compiled into other modules) |
+The module type is defined in each module's `module.json5` file:
 
-### Quick Commands
+```json5
+// {module}/src/main/module.json5
+{
+  "module": {
+    "name": "entry",
+    "type": "entry",    // "entry" = HAP, "shared" = HSP, "har" = HAR
+    ...
+  }
+}
+```
+
+| `type` field value | Module Type | Description |
+|--------------------|-------------|-------------|
+| `"entry"` | **HAP** | Application entry point |
+| `"feature"` | **HAP** | Feature module (also a HAP) |
+| `"shared"` | **HSP** | Dynamic shared package |
+| `"har"` | **HAR** | Static library (compiled into other modules) |
+
+**To identify all module types in a project:**
 
 ```bash
-# Read build-profile.json5 to find all modules
-cat build-profile.json5
-
-# Extract module names and paths (grep)
-grep -E '"name"|"srcPath"' build-profile.json5
+# Read type from each module's module.json5
+# Check {srcPath}/src/main/module.json5 for each module in build-profile.json5
 ```
 
 ## Finding Module Build Outputs
@@ -424,9 +410,31 @@ hdc -t <UDID> shell "bm uninstall -n <bundleName>"
 | `hdc -t <UDID> shell "<cmd>"` | Execute shell command on device |
 | `hdc -t <UDID> file send <local> <remote>` | Push file/directory to device |
 | `hdc -t <UDID> file recv <remote> <local>` | Pull file/directory from device |
+| `hdc tconn <IP>:<port>` | Connect to device over Wi-Fi |
 | `hdc kill` | Kill hdc server |
 | `hdc start` | Start hdc server |
 | `hdc version` | Show hdc version |
+
+### Wireless Debugging (Wi-Fi)
+
+Connect to a device over the network instead of USB:
+
+```bash
+# 1. Connect device via USB first and get its IP address
+hdc -t <UDID> shell "ifconfig"    # Find wlan0 IP
+
+# 2. Enable TCP port on device (if supported)
+hdc -t <UDID> shell "param set persist.hdc.port 5555"
+
+# 3. Connect wirelessly
+hdc tconn <device_IP>:5555
+
+# 4. Verify connection
+hdc list targets
+# Should show the IP-based target alongside or instead of USB target
+```
+
+**Note:** Wireless debugging may require the device and host to be on the same network. Not all devices support `hdc tconn`.
 
 ## Bundle Manager (bm)
 
@@ -436,9 +444,12 @@ Run via `hdc -t <UDID> shell "bm ..."`:
 |---------|-------------|
 | `bm install -p <path>` | Install from directory (all HAP/HSP) |
 | `bm install -p <file.hap>` | Install single HAP file |
+| `bm install -r -p <path>` | Reinstall (replace existing, keep data) |
 | `bm uninstall -n <bundleName>` | Uninstall application |
 | `bm dump -n <bundleName>` | Show package info |
 | `bm dump -a` | List all installed packages |
+| `bm clean -n <bundleName> -c` | Clean application cache |
+| `bm clean -n <bundleName> -d` | Clean application data |
 
 ## Ability Assistant (aa)
 
@@ -449,6 +460,55 @@ Run via `hdc -t <UDID> shell "aa ..."`:
 | `aa start -a <ability> -b <bundle>` | Start specific ability |
 | `aa force-stop <bundleName>` | Force stop application |
 | `aa dump -a` | Dump all running abilities |
+
+## Device Logging (hilog)
+
+Use hilog to view device logs for debugging. Run via `hdc -t <UDID> shell "hilog ..."`:
+
+```bash
+# Stream all logs (like adb logcat)
+hdc -t <UDID> shell "hilog"
+
+# Filter by tag
+hdc -t <UDID> shell "hilog -T <tag>"
+
+# Filter by log level (DEBUG, INFO, WARN, ERROR, FATAL)
+hdc -t <UDID> shell "hilog -L ERROR"
+
+# Combine tag and level filters
+hdc -t <UDID> shell "hilog -T MyApp -L WARN"
+
+# Clear log buffer
+hdc -t <UDID> shell "hilog -r"
+
+# Show only recent logs (last N lines)
+hdc -t <UDID> shell "hilog -t 100"
+```
+
+### Common hilog Options
+
+| Option | Description |
+|--------|-------------|
+| `-T <tag>` | Filter by log tag |
+| `-L <level>` | Minimum log level: DEBUG, INFO, WARN, ERROR, FATAL |
+| `-D <domain>` | Filter by domain (hex, e.g., `0x0001`) |
+| `-r` | Clear log buffer |
+| `-t <count>` | Show only last N log entries |
+| `-x` | Exit after printing existing logs (no streaming) |
+
+### Logging in ArkTS Code
+
+```typescript
+import { hilog } from '@kit.PerformanceAnalysisKit';
+
+const DOMAIN: number = 0x0000;
+const TAG: string = 'MyApp';
+
+hilog.info(DOMAIN, TAG, 'Application started');
+hilog.error(DOMAIN, TAG, 'Failed to load data: %{public}s', error.message);
+```
+
+**Note:** Use `%{public}s` for string parameters that should be visible in logs. Without `{public}`, parameters are masked as `<private>` in release builds.
 
 ## Troubleshooting
 
@@ -471,4 +531,8 @@ Run via `hdc -t <UDID> shell "aa ..."`:
 
 ## Reference Files
 
-- **Complete Installation Guide**: [references/device-installation.md](references/device-installation.md)
+- **Complete Installation Guide**: [references/device-installation.md](references/device-installation.md) - Detailed troubleshooting, version verification scripts, and installation script
+
+## Related Skills
+
+- **arkts-development**: ArkTS/ArkUI development patterns, state management, component lifecycle, and API usage. Use alongside this skill when developing HarmonyOS application code.

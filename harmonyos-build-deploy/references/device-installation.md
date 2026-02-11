@@ -1,53 +1,18 @@
 # Device Installation Guide
 
-Complete guide for building, packaging, and installing HarmonyOS applications to physical devices.
+Detailed guide for packaging and installing HarmonyOS applications to physical devices. This supplements the main [SKILL.md](../SKILL.md) with deeper troubleshooting, version verification, and an installation script.
 
 ## Prerequisites
 
 - **hdc**: HarmonyOS Device Connector (included in HarmonyOS SDK)
 - **Device**: HarmonyOS device with USB debugging enabled
-- **Build Output**: Signed HAP/HSP files
+- **Build Output**: Signed HAP/HSP files from `hvigorw assembleApp`
 
-## Complete Workflow
+## Verifying Build Outputs Before Installation
 
-### Step 1: Check Device Connection
+All HAP/HSP modules must have the **same versionCode**. Mismatched versions cause `"version code not same"` errors during installation.
 
-```bash
-hdc list targets
-# Output: device UDID (e.g., 1234567890ABCDEF)
-```
-
-If no device found:
-1. Check USB connection
-2. Enable Developer Options on device
-3. Enable USB debugging
-4. Run `hdc kill && hdc start` to restart hdc server
-
-### Step 2: Build Project
-
-```bash
-# Incremental build (default, use for normal development)
-hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon
-```
-
-Only perform clean build when encountering issues or first time setup:
-
-```bash
-# Clean build (only when needed)
-hvigorw clean --no-daemon
-ohpm clean && ohpm cache clean
-ohpm install --all
-hvigorw --sync -p product=default -p buildMode=release --no-daemon
-hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon
-```
-
-Build outputs location:
-- APP bundle: `outputs/{product}/{project}-{product}-signed.app`
-- Signed modules: `outputs/{product}/signed/`
-
-### Step 3: Verify Build Outputs
-
-All HAP/HSP modules must have the **same versionCode**. Check for mismatches:
+### Check versionCode of All Modules
 
 ```bash
 # Using Python (cross-platform)
@@ -66,19 +31,34 @@ for f in outputs/default/signed/*.hsp; do
 done
 ```
 
-**How to identify problematic modules:**
+### Identifying Problematic Modules
+
+A module should be removed from the output before installation if:
 
 1. Module directory has no `src/` folder (precompiled binary only)
 2. Module not listed in `build-profile.json5` modules array
 3. Module versionCode differs from `AppScope/app.json5`
 
-If any module has a different versionCode, remove it before installation:
-
 ```bash
 rm outputs/default/signed/problematic-module-default-signed.hsp
 ```
 
-### Step 4: Push Files to Device
+## Complete Installation Workflow
+
+### Step 1: Check Device Connection
+
+```bash
+hdc list targets
+# Output: device UDID (e.g., 1234567890ABCDEF)
+```
+
+If no device found:
+1. Check USB connection
+2. Enable Developer Options on device: Settings > About > Tap build number 7 times
+3. Enable USB debugging: Settings > Developer options > USB debugging
+4. Run `hdc kill && hdc start` to restart hdc server
+
+### Step 2: Push Files to Device
 
 ```bash
 # Clear and create installation directory on device
@@ -88,7 +68,7 @@ hdc -t <UDID> shell "rm -rf /data/local/tmp/app_install && mkdir -p /data/local/
 hdc -t <UDID> file send outputs/default/signed /data/local/tmp/app_install
 ```
 
-### Step 5: Install Application
+### Step 3: Install Application
 
 ```bash
 # Install all HAP/HSP from directory
@@ -97,7 +77,7 @@ hdc -t <UDID> shell "bm install -p /data/local/tmp/app_install/signed"
 # Expected output: "install bundle successfully."
 ```
 
-### Step 6: Verify and Launch
+### Step 4: Verify and Launch
 
 ```bash
 # Check package info
@@ -105,12 +85,6 @@ hdc -t <UDID> shell "bm dump -n <bundleName>"
 
 # Launch application
 hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"
-```
-
-### Uninstall Application
-
-```bash
-hdc -t <UDID> shell "bm uninstall -n <bundleName>"
 ```
 
 ## Quick Installation Script
@@ -141,7 +115,8 @@ hdc -t "$DEVICE_ID" shell "rm -rf $REMOTE_PATH && mkdir -p $REMOTE_PATH"
 hdc -t "$DEVICE_ID" file send "$SIGNED_PATH" "$REMOTE_PATH"
 
 # === Install ===
-hdc -t "$DEVICE_ID" shell "bm install -p $REMOTE_PATH/$(basename $SIGNED_PATH)"
+BASENAME="$(basename "$SIGNED_PATH")"
+hdc -t "$DEVICE_ID" shell "bm install -p $REMOTE_PATH/$BASENAME"
 
 echo ""
 echo "Installation complete!"
@@ -169,55 +144,28 @@ Usage:
 ./install.sh 1234567890ABCDEF outputs/default/signed com.example.app
 ```
 
-## hdc Command Reference
+## Build Output Structure
 
-### Device Management
+```
+outputs/
+└── {product}/                              # e.g., default/
+    ├── {project}-{product}-signed.app      # Complete APP bundle
+    ├── signed/
+    │   ├── entry-{product}-signed.hap      # Main entry HAP
+    │   ├── feature-{product}-signed.hap    # Feature HAP (if any)
+    │   └── *.hsp                           # Shared library modules
+    └── unsigned/
+        └── ...                             # Unsigned versions
+```
 
-| Command | Description |
-|---------|-------------|
-| `hdc list targets` | List connected devices (UDID) |
-| `hdc -t <UDID> shell "<cmd>"` | Execute shell command on device |
-| `hdc kill` | Kill hdc server |
-| `hdc start` | Start hdc server |
-| `hdc version` | Show hdc version |
-
-### File Transfer
-
-| Command | Description |
-|---------|-------------|
-| `hdc -t <UDID> file send <local> <remote>` | Push file/directory to device |
-| `hdc -t <UDID> file recv <remote> <local>` | Pull file/directory from device |
-
-### Bundle Manager (bm)
-
-Execute via `hdc -t <UDID> shell "bm ..."`:
-
-| Command | Description |
-|---------|-------------|
-| `bm install -p <path>` | Install from directory (all HAP/HSP) |
-| `bm install -p <file.hap>` | Install single HAP file |
-| `bm uninstall -n <bundleName>` | Uninstall application |
-| `bm dump -n <bundleName>` | Dump package info |
-| `bm dump -a` | Dump all installed packages |
-
-### Ability Assistant (aa)
-
-Execute via `hdc -t <UDID> shell "aa ..."`:
-
-| Command | Description |
-|---------|-------------|
-| `aa start -a <ability> -b <bundle>` | Start specific ability |
-| `aa force-stop <bundleName>` | Force stop application |
-| `aa dump -a` | Dump all running abilities |
-
-## Troubleshooting
+## Troubleshooting Details
 
 ### Error: "version code not same"
 
 **Cause:** Some HAP/HSP modules have different versionCode than others.
 
 **Solution:**
-1. Use the version check commands to find modules with different versionCode
+1. Use the version check commands above to find modules with different versionCode
 2. Remove those modules from signed directory before installation
 3. Usually caused by precompiled modules not in build-profile.json5
 
@@ -237,8 +185,8 @@ Execute via `hdc -t <UDID> shell "aa ..."`:
 
 **Solution:**
 1. Check USB cable connection
-2. Enable Developer Options: Settings → About → Tap build number 7 times
-3. Enable USB debugging: Settings → Developer options → USB debugging
+2. Enable Developer Options: Settings > About > Tap build number 7 times
+3. Enable USB debugging: Settings > Developer options > USB debugging
 4. Restart hdc server: `hdc kill && hdc start`
 5. Try different USB port or cable
 
@@ -258,35 +206,3 @@ Execute via `hdc -t <UDID> shell "aa ..."`:
 1. Regenerate debug/release certificate in DevEco Studio
 2. Check certificate validity period
 3. Ensure using correct signing config for build type
-
-## Build Output Structure
-
-```
-outputs/
-└── {product}/                              # e.g., default/
-    ├── {project}-{product}-signed.app      # Complete APP bundle
-    ├── signed/
-    │   ├── entry-{product}-signed.hap      # Main entry HAP
-    │   ├── feature-{product}-signed.hap    # Feature HAP (if any)
-    │   └── *.hsp                           # Shared library modules
-    └── unsigned/
-        └── ...                             # Unsigned versions
-```
-
-## Key Configuration Files
-
-| File | Description |
-|------|-------------|
-| `AppScope/app.json5` | App metadata: bundleName, versionCode, versionName, icon, label |
-| `build-profile.json5` | Build config: modules list, products, signing configs |
-| `{module}/src/main/module.json5` | Module config: abilities, permissions, pages |
-| `{module}/oh-package.json5` | Module dependencies |
-
-## Module Types
-
-| Type | Extension | Description |
-|------|-----------|-------------|
-| HAP | `.hap` | Harmony Ability Package - Application entry point |
-| HSP | `.hsp` | Harmony Shared Package - Dynamic shared library |
-| HAR | `.har` | Harmony Archive - Static library (compiled into HAP) |
-| APP | `.app` | Complete bundle containing all HAP + HSP |

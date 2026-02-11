@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.1.0] - 2026-02-11
+
+### Changed
+
+- **harmonyos-build-deploy**: Translated Chinese UI strings to English in SKILL.md
+- **harmonyos-build-deploy**: Removed agent-framework coupling (question() tool, Task() subagent references) — workflows are now framework-agnostic
+- **harmonyos-build-deploy**: Deduplicated content between SKILL.md and device-installation.md — reference file now focuses on version verification, install script, and detailed troubleshooting
+- **harmonyos-build-deploy**: Fixed module type identification — now uses `module.json5` `type` field instead of heuristic based on `targets` presence
+- **harmonyos-build-deploy**: Fixed unquoted variable in install.sh script
+
+### Added
+
+- **harmonyos-build-deploy**: Device logging section (hilog commands, filtering options, ArkTS logging example)
+- **harmonyos-build-deploy**: Wireless debugging documentation (hdc tconn)
+- **harmonyos-build-deploy**: Additional bm commands (install -r reinstall, clean cache/data)
+- **harmonyos-build-deploy**: Cross-reference to arkts-development skill
+
 ## [1.0.1] - 2026-02-11
 
 ### Added

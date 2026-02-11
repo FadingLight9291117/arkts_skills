@@ -1,6 +1,6 @@
 # AI Agent Skills - HarmonyOS/ArkTS Development
 
-[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](CHANGELOG.md)
 
 AI coding agent skills for HarmonyOS/ArkTS application development.
 
@@ -33,7 +33,9 @@ Build, package, and deploy HarmonyOS applications.
 **Covers:**
 - hvigorw build commands
 - ohpm package manager
-- hdc device installation
+- hdc device installation and wireless debugging
+- Device logging (hilog)
+- Module type identification
 - Troubleshooting common errors
 
 ## Quick Deploy
