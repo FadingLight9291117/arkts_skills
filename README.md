@@ -55,12 +55,6 @@ npx skills add https://github.com/FadingLight9291117/arkts_skills --skill harmon
 npx skills add https://github.com/FadingLight9291117/arkts_skills --skill arkts-development
 ```
 
-Or search for skills on [skills.sh](https://skills.sh/) and run the corresponding install command:
-
-```bash
-npx skills add <owner/repo>
-```
-
 Once installed, the skill is automatically configured for your AI agent (supports Cursor, Claude Code, Copilot, and other major agents).
 
 > No additional CLI installation required — `npx` downloads and runs it automatically. To disable anonymous telemetry, set the environment variable `DISABLE_TELEMETRY=1`.
