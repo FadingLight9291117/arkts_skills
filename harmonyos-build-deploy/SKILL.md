@@ -66,9 +66,10 @@ Delegate to subagent with the following steps:
 Delegate to subagent with the following steps:
 
 1. Read `AppScope/app.json5` to get bundleName
-2. Deploy to device (see [Push and Install](#push-and-install) below)
-3. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
-4. Report success/failure with details
+2. Check `outputs/default/bundles/signed/` for existing build outputs. If empty or missing, collect signed HAP/HSP from each module's build directory (`{srcPath}/build/default/outputs/default/*-signed.*`) into `outputs/default/bundles/signed/`. See [module-discovery.md](references/module-discovery.md) for details.
+3. Deploy to device (see [Push and Install](#push-and-install) below)
+4. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
+5. Report success/failure with details
 
 ### Clean App Cache/Data
 
