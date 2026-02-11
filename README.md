@@ -1,4 +1,4 @@
-# AI Skills - HarmonyOS/ArkTS Development
+# AI Agent Skills - HarmonyOS/ArkTS Development
 
 [![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](CHANGELOG.md)
 
