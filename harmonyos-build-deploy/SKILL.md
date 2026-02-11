@@ -35,20 +35,16 @@ Complete workflow for building, cleaning, packaging, and installing HarmonyOS ap
 # Build complete app (incremental)
 hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon
 
-# Install to device (check actual output path in your project)
+# Install to device
 # Use a random directory name to avoid conflicts with previous installations
 INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
 hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
-hdc -t <UDID> file send <output_path>/signed $INSTALL_DIR
+hdc -t <UDID> file send outputs/default/bundles/signed $INSTALL_DIR
 hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
 hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
 ```
 
-**Note:** Build output path varies by project. Common paths:
-- `outputs/default/signed/`
-- `outputs/project/bundles/signed/`
-
-Check your project's actual output after build.
+**Note:** Build output path is `outputs/default/bundles/signed/`.
 
 ## Workflows
 
@@ -61,12 +57,12 @@ Delegate to subagent with the following steps:
 1. Clean: `hvigorw clean --no-daemon`
 2. Install dependencies: `ohpm install --all`
 3. Build: `hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon`
-4. Find build output (check `outputs/default/signed/` or `outputs/project/bundles/signed/`)
+4. Build output is at `outputs/default/bundles/signed/`
 5. Deploy to device:
    ```bash
    INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
    hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
-   hdc -t <UDID> file send <output_path>/signed $INSTALL_DIR
+   hdc -t <UDID> file send outputs/default/bundles/signed $INSTALL_DIR
    hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
    hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
    ```
@@ -82,7 +78,7 @@ Delegate to subagent with the following steps:
    ```bash
    INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
    hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
-   hdc -t <UDID> file send <output_path>/signed $INSTALL_DIR
+   hdc -t <UDID> file send outputs/default/bundles/signed $INSTALL_DIR
    hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
    hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
    ```
@@ -205,19 +201,13 @@ hvigorw assembleApp    # Build complete APP bundle
 
 ## Build Outputs
 
-Build output path varies by project configuration. Common patterns:
+Build output path: `outputs/default/bundles/signed/`
 
 ```
-outputs/
-├── default/signed/                      # Pattern 1
-│   ├── entry-default-signed.hap
-│   └── *.hsp
-└── project/bundles/signed/              # Pattern 2
-    ├── entry-default-signed.hap
-    └── *.hsp
+outputs/default/bundles/signed/
+├── entry-default-signed.hap
+└── *.hsp
 ```
-
-**Tip:** After build, check the actual output directory in your project.
 
 ### Module Types
 
@@ -261,7 +251,7 @@ INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
 hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
 
 # Push signed bundles
-hdc -t <UDID> file send path/to/signed $INSTALL_DIR
+hdc -t <UDID> file send outputs/default/bundles/signed $INSTALL_DIR
 
 # Install all HAP/HSP in directory
 hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
