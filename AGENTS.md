@@ -223,5 +223,6 @@ When making changes, follow this checklist:
 3. **Check**: Did I add new functionality? → Update "Covers" section in README
 4. Update README.md if needed
 5. **ALWAYS** update CHANGELOG.md with a summary of changes for every commit
+6. **ALWAYS** sync the version badge in README.md when CHANGELOG.md version changes
 
 
