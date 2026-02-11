@@ -36,9 +36,12 @@ Complete workflow for building, cleaning, packaging, and installing HarmonyOS ap
 hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon
 
 # Install to device (check actual output path in your project)
-hdc -t <UDID> shell "rm -rf /data/local/tmp/install && mkdir -p /data/local/tmp/install"
-hdc -t <UDID> file send <output_path>/signed /data/local/tmp/install
-hdc -t <UDID> shell "bm install -p /data/local/tmp/install/signed"
+# Use a random directory name to avoid conflicts with previous installations
+INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
+hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
+hdc -t <UDID> file send <output_path>/signed $INSTALL_DIR
+hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
+hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
 ```
 
 **Note:** Build output path varies by project. Common paths:
@@ -61,9 +64,11 @@ Delegate to subagent with the following steps:
 4. Find build output (check `outputs/default/signed/` or `outputs/project/bundles/signed/`)
 5. Deploy to device:
    ```bash
-   hdc -t <UDID> shell "rm -rf /data/local/tmp/install && mkdir -p /data/local/tmp/install"
-   hdc -t <UDID> file send <output_path>/signed /data/local/tmp/install
-   hdc -t <UDID> shell "bm install -p /data/local/tmp/install/signed"
+   INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
+   hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
+   hdc -t <UDID> file send <output_path>/signed $INSTALL_DIR
+   hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
+   hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
    ```
 6. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
 7. Report success/failure with details
@@ -75,9 +80,11 @@ Delegate to subagent with the following steps:
 1. Read `AppScope/app.json5` to get bundleName
 2. Push existing build output to device:
    ```bash
-   hdc -t <UDID> shell "rm -rf /data/local/tmp/install && mkdir -p /data/local/tmp/install"
-   hdc -t <UDID> file send <output_path>/signed /data/local/tmp/install
-   hdc -t <UDID> shell "bm install -p /data/local/tmp/install/signed"
+   INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
+   hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
+   hdc -t <UDID> file send <output_path>/signed $INSTALL_DIR
+   hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
+   hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
    ```
 3. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
 4. Report success/failure with details
@@ -249,14 +256,18 @@ hdc -t <UDID> shell "whoami"  # Test connection
 ### Push and Install
 
 ```bash
-# Clear device directory
-hdc -t <UDID> shell "rm -rf /data/local/tmp/install && mkdir -p /data/local/tmp/install"
+# Create random temp directory on device
+INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
+hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
 
 # Push signed bundles
-hdc -t <UDID> file send path/to/signed /data/local/tmp/install
+hdc -t <UDID> file send path/to/signed $INSTALL_DIR
 
 # Install all HAP/HSP in directory
-hdc -t <UDID> shell "bm install -p /data/local/tmp/install/signed"
+hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
+
+# Clean up temp directory
+hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
 ```
 
 ### Verify and Launch

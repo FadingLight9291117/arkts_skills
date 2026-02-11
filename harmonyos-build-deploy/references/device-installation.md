@@ -61,20 +61,24 @@ If no device found:
 ### Step 2: Push Files to Device
 
 ```bash
-# Clear and create installation directory on device
-hdc -t <UDID> shell "rm -rf /data/local/tmp/app_install && mkdir -p /data/local/tmp/app_install"
+# Create random temp directory on device
+INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
+hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
 
 # Push signed HAP/HSP files
-hdc -t <UDID> file send outputs/default/signed /data/local/tmp/app_install
+hdc -t <UDID> file send outputs/default/signed $INSTALL_DIR
 ```
 
 ### Step 3: Install Application
 
 ```bash
 # Install all HAP/HSP from directory
-hdc -t <UDID> shell "bm install -p /data/local/tmp/app_install/signed"
+hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
 
 # Expected output: "install bundle successfully."
+
+# Clean up temp directory
+hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
 ```
 
 ### Step 4: Verify and Launch
@@ -98,7 +102,7 @@ Save as `install.sh` (Linux/macOS) or run with Git Bash on Windows:
 DEVICE_ID="${1:-$(hdc list targets | head -1)}"
 SIGNED_PATH="${2:-outputs/default/signed}"
 BUNDLE_NAME="${3:-}"
-REMOTE_PATH="/data/local/tmp/app_install"
+REMOTE_PATH="/data/local/tmp/install_$(date +%s)"
 
 if [ -z "$DEVICE_ID" ]; then
     echo "Error: No device found. Connect a device or specify UDID as first argument."
@@ -107,9 +111,10 @@ fi
 
 echo "Device: $DEVICE_ID"
 echo "Source: $SIGNED_PATH"
+echo "Remote: $REMOTE_PATH"
 
-# === Clear remote directory ===
-hdc -t "$DEVICE_ID" shell "rm -rf $REMOTE_PATH && mkdir -p $REMOTE_PATH"
+# === Create remote directory ===
+hdc -t "$DEVICE_ID" shell "mkdir -p $REMOTE_PATH"
 
 # === Push signed files ===
 hdc -t "$DEVICE_ID" file send "$SIGNED_PATH" "$REMOTE_PATH"
@@ -117,6 +122,9 @@ hdc -t "$DEVICE_ID" file send "$SIGNED_PATH" "$REMOTE_PATH"
 # === Install ===
 BASENAME="$(basename "$SIGNED_PATH")"
 hdc -t "$DEVICE_ID" shell "bm install -p $REMOTE_PATH/$BASENAME"
+
+# === Clean up ===
+hdc -t "$DEVICE_ID" shell "rm -rf $REMOTE_PATH"
 
 echo ""
 echo "Installation complete!"
