@@ -39,12 +39,12 @@ hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-
 # Use a random directory name to avoid conflicts with previous installations
 INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
 hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
-hdc -t <UDID> file send outputs/default/bundles/signed $INSTALL_DIR
-hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
+hdc -t <UDID> file send outputs $INSTALL_DIR
+hdc -t <UDID> shell "bm install -p $INSTALL_DIR/outputs"
 hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
 ```
 
-**Note:** Build output path is `outputs/default/bundles/signed/`.
+**Note:** Build output path is `outputs/`.
 
 ## Workflows
 
@@ -66,7 +66,7 @@ Delegate to subagent with the following steps:
 Delegate to subagent with the following steps:
 
 1. Read `AppScope/app.json5` to get bundleName
-2. Check `outputs/default/bundles/signed/` for existing build outputs. If empty or missing, collect signed HAP/HSP from each module's build directory (`{srcPath}/build/default/outputs/default/*-signed.*`) into `outputs/default/bundles/signed/`. See [module-discovery.md](references/module-discovery.md) for details.
+2. Check `outputs/` for existing build outputs. If empty or missing, collect signed HAP/HSP from each module's build directory (`{srcPath}/build/default/outputs/default/*-signed.*`) into `outputs/`. See [module-discovery.md](references/module-discovery.md) for details.
 3. Deploy to device (see [Push and Install](#push-and-install) below)
 4. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
 5. Report success/failure with details
@@ -170,10 +170,10 @@ hvigorw --sync -p product=default -p buildMode=release --no-daemon
 
 ## Build Outputs
 
-Build output path: `outputs/default/bundles/signed/`
+Build output path: `outputs/`
 
 ```
-outputs/default/bundles/signed/
+outputs/
 ├── entry-default-signed.hap
 └── *.hsp
 ```
@@ -220,10 +220,10 @@ INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
 hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
 
 # Push signed bundles
-hdc -t <UDID> file send outputs/default/bundles/signed $INSTALL_DIR
+hdc -t <UDID> file send outputs $INSTALL_DIR
 
 # Install all HAP/HSP in directory
-hdc -t <UDID> shell "bm install -p $INSTALL_DIR/signed"
+hdc -t <UDID> shell "bm install -p $INSTALL_DIR/outputs"
 
 # Clean up temp directory
 hdc -t <UDID> shell "rm -rf $INSTALL_DIR"

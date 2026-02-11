@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **harmonyos-build-deploy**: Extracted module discovery, build outputs, and unwanted modules into `references/module-discovery.md` (~138 lines moved out of SKILL.md)
 - **harmonyos-build-deploy**: Fixed unquoted variable in install.sh script
 - **harmonyos-build-deploy**: Deploy Only workflow now checks for empty output directory and collects signed artifacts from module build directories
+- **harmonyos-build-deploy**: Simplified build output path from `outputs/default/bundles/signed/` to `outputs/`
 
 ### Removed
 

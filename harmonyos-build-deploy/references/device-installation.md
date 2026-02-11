@@ -18,14 +18,14 @@ All HAP/HSP modules must have the **same versionCode**. Mismatched versions caus
 # Using Python (cross-platform)
 python3 -c "
 import zipfile, json, glob
-for f in glob.glob('outputs/default/bundles/signed/*.hsp'):
+for f in glob.glob('outputs/*.hsp'):
     z = zipfile.ZipFile(f)
     data = json.loads(z.read('module.json'))
     print(f\"{f.split('/')[-1]}: versionCode = {data['app']['versionCode']}\")
 "
 
 # Using unzip + grep (Linux/macOS)
-for f in outputs/default/bundles/signed/*.hsp; do
+for f in outputs/*.hsp; do
     echo -n "$(basename $f): "
     unzip -p "$f" module.json | grep -o '"versionCode":[0-9]*'
 done
@@ -40,7 +40,7 @@ A module should be removed from the output before installation if:
 3. Module versionCode differs from `AppScope/app.json5`
 
 ```bash
-rm outputs/default/bundles/signed/problematic-module-default-signed.hsp
+rm outputs/problematic-module-default-signed.hsp
 ```
 
 ## Quick Installation Script
@@ -52,7 +52,7 @@ Save as `install.sh` (Linux/macOS) or run with Git Bash on Windows:
 
 # === Configuration ===
 DEVICE_ID="${1:-$(hdc list targets | head -1)}"
-SIGNED_PATH="${2:-outputs/default/bundles/signed}"
+SIGNED_PATH="${2:-outputs}"
 BUNDLE_NAME="${3:-}"
 REMOTE_PATH="/data/local/tmp/install_$(date +%s)"
 
@@ -98,8 +98,8 @@ Usage:
 ./install.sh 1234567890ABCDEF
 
 # Specify device and path
-./install.sh 1234567890ABCDEF outputs/default/bundles/signed
+./install.sh 1234567890ABCDEF outputs
 
 # Specify device, path, and bundle name (auto-launch)
-./install.sh 1234567890ABCDEF outputs/default/bundles/signed com.example.app
+./install.sh 1234567890ABCDEF outputs com.example.app
 ```

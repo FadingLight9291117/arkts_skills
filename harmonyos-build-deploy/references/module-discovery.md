@@ -136,7 +136,7 @@ Sometimes HSP files appear in the output directory that are **not listed in `bui
 
 ```bash
 # Example: Remove modules not in build-profile.json5
-rm outputs/default/bundles/signed/unwanted-module-default-signed.hsp
+rm outputs/unwanted-module-default-signed.hsp
 ```
 
 **Note:** Installation will fail with "version code not same" error if these unwanted modules have a different versionCode than the main app. The root cause is that these modules shouldn't be deployed at all.
