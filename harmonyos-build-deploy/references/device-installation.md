@@ -4,6 +4,36 @@ Detailed guide for verifying build outputs and automating device installation. T
 
 **Note:** All device paths use `//` prefix for Git Bash compatibility on Windows.
 
+**Git Bash on Windows (IMPORTANT):** disable MSYS path conversion for `hdc`.
+
+Without this, MSYS may rewrite paths and `hdc file send` can behave unexpectedly.
+
+```bash
+export MSYS_NO_PATHCONV=1
+```
+
+**Important:** `hdc file send` preserves the local directory structure on the device. For example, sending `outputs/entry-default-signed.hap` to `$REMOTE_PATH/` results in `$REMOTE_PATH/outputs/entry-default-signed.hap` on the device. When installing, point `bm install -p` at the directory that actually contains the packages (typically `$REMOTE_PATH/outputs`).
+
+## Common Errors
+
+### `install file path invalid`
+
+This usually means the path passed to `bm install -p` does not directly contain any `.hap`/`.hsp` files.
+
+Most often on Windows/Git Bash this happens because `hdc file send` preserves the local folder name (`outputs/`). If you push `outputs/*.hap` and `outputs/*.hsp` to `$REMOTE_PATH/`, the artifacts end up under `$REMOTE_PATH/outputs/`, so you must install from that directory:
+
+```bash
+hdc -t "$DEVICE_ID" shell "bm install -p $REMOTE_PATH/outputs"
+```
+
+Quick verification on device:
+
+```bash
+hdc -t "$DEVICE_ID" shell "find $REMOTE_PATH -maxdepth 2 -type f -print"
+```
+
+If you are on Git Bash, also ensure `MSYS_NO_PATHCONV=1` is set before running `hdc`.
+
 ## Prerequisites
 
 - **hdc**: HarmonyOS Device Connector (included in HarmonyOS SDK)
@@ -58,6 +88,9 @@ SIGNED_PATH="${2:-outputs}"
 BUNDLE_NAME="${3:-}"
 REMOTE_PATH="//data/local/tmp/install_$(date +%s)"
 
+# Disable MSYS path conversion (Git Bash on Windows)
+export MSYS_NO_PATHCONV=1
+
 if [ -z "$DEVICE_ID" ]; then
     echo "Error: No device found. Connect a device or specify UDID as first argument."
     exit 1
@@ -70,13 +103,16 @@ echo "Remote: $REMOTE_PATH"
 # === Create remote directory ===
 hdc -t "$DEVICE_ID" shell "mkdir -p $REMOTE_PATH"
 
-# === Push only .hap and .hsp files ===
+# === Push only .hap and .hsp files (one-by-one) to explicit remote file paths ===
 for f in "$SIGNED_PATH"/*.hap "$SIGNED_PATH"/*.hsp; do
-    [ -f "$f" ] && hdc -t "$DEVICE_ID" file send "$f" "$REMOTE_PATH/"
+    [ -f "$f" ] && hdc -t "$DEVICE_ID" file send "$f" "$REMOTE_PATH/$(basename "$f")"
 done
 
-# === Install ===
-hdc -t "$DEVICE_ID" shell "bm install -p $REMOTE_PATH"
+# === Install (reinstall) ===
+# Install HSPs first, then the HAP.
+for f in "$SIGNED_PATH"/*.hsp "$SIGNED_PATH"/*.hap; do
+    [ -f "$f" ] && hdc -t "$DEVICE_ID" shell "bm install -p $REMOTE_PATH/$(basename \"$f\") -r"
+done
 
 # === Clean up ===
 hdc -t "$DEVICE_ID" shell "rm -rf $REMOTE_PATH"
