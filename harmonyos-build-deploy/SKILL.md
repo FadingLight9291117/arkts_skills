@@ -248,6 +248,114 @@ outputs/
 | HAR | `.har` | Harmony Archive - Static library (compiled into HAP) |
 | APP | `.app` | Complete application bundle (all HAP + HSP) |
 
+## Finding Modules
+
+All modules are defined in `build-profile.json5` at the project root, in the `modules` array.
+
+### Module Definition Structure
+
+```json5
+{
+  "modules": [
+    {
+      "name": "entry",              // Module name (used in build commands)
+      "srcPath": "./entry",         // Module source path (relative to project root)
+      "targets": [                  // Build target config (optional)
+        {
+          "name": "default",
+          "applyToProducts": ["default", "app_store"]
+        }
+      ]
+    },
+    {
+      "name": "support_http",
+      "srcPath": "./support/support_http",
+      "targets": [...]
+    }
+  ]
+}
+```
+
+### Key Fields
+
+| Field | Description |
+|-------|-------------|
+| `name` | Module name, used in build commands (e.g., `-p module=entry@default`) |
+| `srcPath` | Module source path relative to project root |
+| `targets` | Build target config, specifies which products this module applies to |
+
+### Module Type Identification
+
+| Characteristic | Module Type |
+|----------------|-------------|
+| Has `targets` and `name` is `entry` | **HAP** (Application entry) |
+| Has `targets` config | **HSP** (Dynamic shared package) |
+| No `targets` config | **HAR** (Static library, compiled into other modules) |
+
+### Quick Commands
+
+```bash
+# Read build-profile.json5 to find all modules
+cat build-profile.json5
+
+# Extract module names and paths (grep)
+grep -E '"name"|"srcPath"' build-profile.json5
+```
+
+## Finding Module Build Outputs
+
+Module build outputs are located at:
+
+```
+{srcPath}/build/default/outputs/default/
+```
+
+**Note:** Debug and Release builds output to the same directory. The difference is in the signing configuration used (defined in `build-profile.json5` → `signingConfigs`).
+
+### Output Files
+
+| File | Description |
+|------|-------------|
+| `{name}-default-signed.hsp` | **Signed HSP** (ready for installation) |
+| `{name}-default-unsigned.hsp` | Unsigned HSP |
+| `{name}.har` | HAR static library |
+| `app/{name}-default.hsp` | Intermediate artifact |
+| `mapping/sourceMaps.map` | Source maps for debugging |
+
+### Example
+
+For module `support_http` with `srcPath: "./support/support_http"`:
+
+```
+support/support_http/build/default/outputs/default/
+├── support_http-default-signed.hsp    ← Signed, ready to install
+├── support_http-default-unsigned.hsp
+├── support_http.har
+├── app/
+│   └── support_http-default.hsp
+├── mapping/
+│   └── sourceMaps.map
+└── pack.info
+```
+
+### Search Commands
+
+```bash
+# Find all signed HSP/HAP outputs
+dir /s /b "*-signed.hsp" "*-signed.hap" 2>nul           # Windows
+find . -name "*-signed.hsp" -o -name "*-signed.hap"     # Linux/macOS
+
+# Find specific module's output
+dir /s /b "{srcPath}\build\default\outputs\default\*"   # Windows
+ls -la {srcPath}/build/default/outputs/default/         # Linux/macOS
+```
+
+### Notes
+
+1. **Build required**: If `build/` directory doesn't exist, run build first
+2. **Project-level outputs**: Complete app bundle is in project root `outputs/` after `assembleApp`
+3. **oh_modules outputs**: Dependency modules may have outputs in `oh_modules/@xxx/build/...` (these are resolved dependencies)
+
 ## Unwanted Modules in Output Directory
 
 Sometimes HSP files appear in the output directory that are **not listed in `build-profile.json5`**. These modules should not be deployed.

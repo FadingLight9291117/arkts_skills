@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.1] - 2026-02-11
+
+### Added
+
+- **harmonyos-build-deploy**: Finding Modules section (module definitions in build-profile.json5, module type identification)
+- **harmonyos-build-deploy**: Finding Module Build Outputs section (output paths, signed/unsigned artifacts, search commands)
+
 ## [1.0.0] - 2026-02-10
 
 ### Added
