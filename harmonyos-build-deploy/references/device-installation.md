@@ -68,12 +68,13 @@ echo "Remote: $REMOTE_PATH"
 # === Create remote directory ===
 hdc -t "$DEVICE_ID" shell "mkdir -p $REMOTE_PATH"
 
-# === Push signed files ===
-hdc -t "$DEVICE_ID" file send "$SIGNED_PATH" "$REMOTE_PATH"
+# === Push only .hap and .hsp files ===
+for f in "$SIGNED_PATH"/*.hap "$SIGNED_PATH"/*.hsp; do
+    [ -f "$f" ] && hdc -t "$DEVICE_ID" file send "$f" "$REMOTE_PATH/"
+done
 
 # === Install ===
-BASENAME="$(basename "$SIGNED_PATH")"
-hdc -t "$DEVICE_ID" shell "bm install -p $REMOTE_PATH/$BASENAME"
+hdc -t "$DEVICE_ID" shell "bm install -p $REMOTE_PATH"
 
 # === Clean up ===
 hdc -t "$DEVICE_ID" shell "rm -rf $REMOTE_PATH"

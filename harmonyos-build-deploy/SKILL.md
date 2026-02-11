@@ -39,8 +39,11 @@ hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-
 # Use a random directory name to avoid conflicts with previous installations
 INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
 hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
-hdc -t <UDID> file send outputs $INSTALL_DIR
-hdc -t <UDID> shell "bm install -p $INSTALL_DIR/outputs"
+# Only push .hap and .hsp files
+for f in outputs/*.hap outputs/*.hsp; do
+    [ -f "$f" ] && hdc -t <UDID> file send "$f" $INSTALL_DIR/
+done
+hdc -t <UDID> shell "bm install -p $INSTALL_DIR"
 hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
 ```
 
@@ -219,11 +222,13 @@ hdc -t <UDID> shell "whoami"  # Test connection
 INSTALL_DIR="/data/local/tmp/install_$(date +%s)"
 hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
 
-# Push signed bundles
-hdc -t <UDID> file send outputs $INSTALL_DIR
+# Only push .hap and .hsp files
+for f in outputs/*.hap outputs/*.hsp; do
+    [ -f "$f" ] && hdc -t <UDID> file send "$f" $INSTALL_DIR/
+done
 
 # Install all HAP/HSP in directory
-hdc -t <UDID> shell "bm install -p $INSTALL_DIR/outputs"
+hdc -t <UDID> shell "bm install -p $INSTALL_DIR"
 
 # Clean up temp directory
 hdc -t <UDID> shell "rm -rf $INSTALL_DIR"

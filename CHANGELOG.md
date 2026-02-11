@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **harmonyos-build-deploy**: Fixed unquoted variable in install.sh script
 - **harmonyos-build-deploy**: Deploy Only workflow now checks for empty output directory and collects signed artifacts from module build directories
 - **harmonyos-build-deploy**: Simplified build output path from `outputs/default/bundles/signed/` to `outputs/`
+- **harmonyos-build-deploy**: Device push now filters by `.hap`/`.hsp` extension instead of sending entire directory
 
 ### Removed
 
