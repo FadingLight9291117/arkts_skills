@@ -17,7 +17,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- **harmonyos-build-deploy**: Device logging section (hilog commands, filtering options, ArkTS logging example)
 - **harmonyos-build-deploy**: Wireless debugging documentation (hdc tconn)
 - **harmonyos-build-deploy**: Additional bm commands (install -r reinstall, clean cache/data)
 - **harmonyos-build-deploy**: Cross-reference to arkts-development skill

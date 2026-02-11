@@ -334,55 +334,6 @@ Run via `hdc -t <UDID> shell "aa ..."`:
 | `aa force-stop <bundleName>` | Force stop application |
 | `aa dump -a` | Dump all running abilities |
 
-## Device Logging (hilog)
-
-Use hilog to view device logs for debugging. Run via `hdc -t <UDID> shell "hilog ..."`:
-
-```bash
-# Stream all logs (like adb logcat)
-hdc -t <UDID> shell "hilog"
-
-# Filter by tag
-hdc -t <UDID> shell "hilog -T <tag>"
-
-# Filter by log level (DEBUG, INFO, WARN, ERROR, FATAL)
-hdc -t <UDID> shell "hilog -L ERROR"
-
-# Combine tag and level filters
-hdc -t <UDID> shell "hilog -T MyApp -L WARN"
-
-# Clear log buffer
-hdc -t <UDID> shell "hilog -r"
-
-# Show only recent logs (last N lines)
-hdc -t <UDID> shell "hilog -t 100"
-```
-
-### Common hilog Options
-
-| Option | Description |
-|--------|-------------|
-| `-T <tag>` | Filter by log tag |
-| `-L <level>` | Minimum log level: DEBUG, INFO, WARN, ERROR, FATAL |
-| `-D <domain>` | Filter by domain (hex, e.g., `0x0001`) |
-| `-r` | Clear log buffer |
-| `-t <count>` | Show only last N log entries |
-| `-x` | Exit after printing existing logs (no streaming) |
-
-### Logging in ArkTS Code
-
-```typescript
-import { hilog } from '@kit.PerformanceAnalysisKit';
-
-const DOMAIN: number = 0x0000;
-const TAG: string = 'MyApp';
-
-hilog.info(DOMAIN, TAG, 'Application started');
-hilog.error(DOMAIN, TAG, 'Failed to load data: %{public}s', error.message);
-```
-
-**Note:** Use `%{public}s` for string parameters that should be visible in logs. Without `{public}`, parameters are masked as `<private>` in release builds.
-
 ## Troubleshooting
 
 | Error | Cause | Solution |

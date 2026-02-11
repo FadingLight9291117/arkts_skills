@@ -34,7 +34,6 @@ Build, package, and deploy HarmonyOS applications.
 - hvigorw build commands
 - ohpm package manager
 - hdc device installation and wireless debugging
-- Device logging (hilog)
 - Module type identification
 - Troubleshooting common errors
 
