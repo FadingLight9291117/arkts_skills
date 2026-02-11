@@ -15,9 +15,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **harmonyos-build-deploy**: Extracted module discovery, build outputs, and unwanted modules into `references/module-discovery.md` (~138 lines moved out of SKILL.md)
 - **harmonyos-build-deploy**: Fixed unquoted variable in install.sh script
 
+### Removed
+
+- **harmonyos-build-deploy**: Wireless debugging (hdc tconn) section — environment setup, not build/deploy
+- **harmonyos-build-deploy**: Restart App workflow — runtime operation, not build/deploy
+- **harmonyos-build-deploy**: `aa dump -a` command — runtime debugging, not build/deploy
+- **harmonyos-build-deploy**: Duplicate Build Output Structure from device-installation.md (already in SKILL.md and module-discovery.md)
+
 ### Added
 
-- **harmonyos-build-deploy**: Wireless debugging documentation (hdc tconn)
 - **harmonyos-build-deploy**: Additional bm commands (install -r reinstall, clean cache/data)
 - **harmonyos-build-deploy**: Cross-reference to arkts-development skill
 - **harmonyos-build-deploy**: New reference file `references/module-discovery.md`

@@ -152,18 +152,6 @@ Usage:
 ./install.sh 1234567890ABCDEF outputs/default/bundles/signed com.example.app
 ```
 
-## Build Output Structure
-
-```
-outputs/
-└── default/
-    └── bundles/
-        └── signed/
-            ├── entry-default-signed.hap      # Main entry HAP
-            ├── feature-default-signed.hap     # Feature HAP (if any)
-            └── *.hsp                          # Shared library modules
-```
-
 ## Troubleshooting Details
 
 ### Error: "version code not same"

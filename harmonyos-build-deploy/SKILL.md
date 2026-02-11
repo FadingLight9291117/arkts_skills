@@ -85,14 +85,6 @@ Delegate to subagent with the following steps:
 3. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
 4. Report success/failure with details
 
-### Restart App
-
-Delegate to subagent:
-
-1. Force stop: `hdc -t <UDID> shell "aa force-stop <bundleName>"`
-2. Launch: `hdc -t <UDID> shell "aa start -a EntryAbility -b <bundleName>"`
-3. Report success/failure
-
 ### Clean App Cache/Data
 
 Delegate to subagent:
@@ -284,31 +276,9 @@ hdc -t <UDID> shell "bm uninstall -n <bundleName>"
 | `hdc -t <UDID> shell "<cmd>"` | Execute shell command on device |
 | `hdc -t <UDID> file send <local> <remote>` | Push file/directory to device |
 | `hdc -t <UDID> file recv <remote> <local>` | Pull file/directory from device |
-| `hdc tconn <IP>:<port>` | Connect to device over Wi-Fi |
 | `hdc kill` | Kill hdc server |
 | `hdc start` | Start hdc server |
 | `hdc version` | Show hdc version |
-
-### Wireless Debugging (Wi-Fi)
-
-Connect to a device over the network instead of USB:
-
-```bash
-# 1. Connect device via USB first and get its IP address
-hdc -t <UDID> shell "ifconfig"    # Find wlan0 IP
-
-# 2. Enable TCP port on device (if supported)
-hdc -t <UDID> shell "param set persist.hdc.port 5555"
-
-# 3. Connect wirelessly
-hdc tconn <device_IP>:5555
-
-# 4. Verify connection
-hdc list targets
-# Should show the IP-based target alongside or instead of USB target
-```
-
-**Note:** Wireless debugging may require the device and host to be on the same network. Not all devices support `hdc tconn`.
 
 ## Bundle Manager (bm)
 
@@ -333,7 +303,6 @@ Run via `hdc -t <UDID> shell "aa ..."`:
 |---------|-------------|
 | `aa start -a <ability> -b <bundle>` | Start specific ability |
 | `aa force-stop <bundleName>` | Force stop application |
-| `aa dump -a` | Dump all running abilities |
 
 ## Troubleshooting
 
