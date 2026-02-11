@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-02-11
+
 ### Changed
 
 - **harmonyos-build-deploy**: Translated Chinese UI strings to English in SKILL.md
