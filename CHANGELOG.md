@@ -6,7 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-06-12
+
+### Fixed
+
+- **README**: Removed outdated "wireless debugging" from harmonyos-build-deploy Covers section (feature was removed from the skill)
+- **harmonyos-build-deploy**: Removed stale directory-push guidance from device-installation.md — `install file path invalid` section now clarifies the error only occurs with whole-directory push, not the recommended per-file workflow
+- **harmonyos-build-deploy**: versionCode verification scripts now check `.hap` files in addition to `.hsp`
+- **harmonyos-build-deploy**: install.sh device auto-detection now handles hdc's `[Empty]` output and Windows `\r` line endings
+- **harmonyos-build-deploy**: Replaced placeholder code block in module-discovery.md with an actual module type discovery command
+
 ### Changed
+
+- **harmonyos-build-deploy**: Quick Reference no longer duplicates the full Push and Install script — now cross-references the section
+- **arkts-development**: Replaced duplicated hvigorw build section with cross-reference to harmonyos-build-deploy skill; kept test commands (not covered by the build skill)
 
 - **harmonyos-build-deploy**: Translated Chinese UI strings to English in SKILL.md
 - **harmonyos-build-deploy**: Removed agent-framework coupling (question() tool, Task() subagent references) — workflows are now framework-agnostic but marked for subagent delegation
@@ -28,6 +41,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **CLAUDE.md** with repo guidance for Claude Code (structure, content rules, maintenance workflow)
+- **arkts-development**: Split state-management-v2.md (1711 lines) into three files — new `references/state-management-v2-migration.md` (V1→V2 migration) and `references/state-management-v2-practices.md` (best practices & troubleshooting)
 - **harmonyos-build-deploy**: Additional bm commands (install -r reinstall, clean cache/data)
 - **harmonyos-build-deploy**: Cross-reference to arkts-development skill
 - **harmonyos-build-deploy**: New reference file `references/module-discovery.md`

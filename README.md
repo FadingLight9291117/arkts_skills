@@ -1,6 +1,6 @@
 # AI Agent Skills - HarmonyOS/ArkTS Development
 
-[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](CHANGELOG.md)
 
 AI coding agent skills for HarmonyOS/ArkTS application development.
 
@@ -33,7 +33,7 @@ Build, package, and deploy HarmonyOS applications.
 **Covers:**
 - hvigorw build commands
 - ohpm package manager
-- hdc device installation and wireless debugging
+- hdc device installation
 - Module type identification
 - Troubleshooting common errors
 
@@ -74,6 +74,7 @@ These skills are automatically loaded by the AI agent when relevant tasks are de
 ```
 AGENTS.md                       # Guidelines for AI agents
 CHANGELOG.md                    # Version history
+CLAUDE.md                       # Claude Code repo guidance
 README.md                       # This file
 arkts-development/
 ├── SKILL.md
@@ -89,7 +90,9 @@ arkts-development/
     ├── hstack.md
     ├── hvigor-commandline.md
     ├── migration-guide.md
-    └── state-management-v2.md
+    ├── state-management-v2.md
+    ├── state-management-v2-migration.md
+    └── state-management-v2-practices.md
 harmonyos-build-deploy/
 ├── SKILL.md
 └── references/

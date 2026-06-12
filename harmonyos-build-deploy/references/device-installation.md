@@ -12,27 +12,21 @@ Without this, MSYS may rewrite paths and `hdc file send` can behave unexpectedly
 export MSYS_NO_PATHCONV=1
 ```
 
-**Important:** `hdc file send` preserves the local directory structure on the device. For example, sending `outputs/entry-default-signed.hap` to `$REMOTE_PATH/` results in `$REMOTE_PATH/outputs/entry-default-signed.hap` on the device. When installing, point `bm install -p` at the directory that actually contains the packages (typically `$REMOTE_PATH/outputs`).
-
 ## Common Errors
 
 ### `install file path invalid`
 
-This usually means the path passed to `bm install -p` does not directly contain any `.hap`/`.hsp` files.
+This means the path passed to `bm install -p` does not directly contain any `.hap`/`.hsp` files.
 
-Most often on Windows/Git Bash this happens because `hdc file send` preserves the local folder name (`outputs/`). If you push `outputs/*.hap` and `outputs/*.hsp` to `$REMOTE_PATH/`, the artifacts end up under `$REMOTE_PATH/outputs/`, so you must install from that directory:
+The recommended workflow (see [SKILL.md](../SKILL.md)) pushes each file to an explicit remote file path, which avoids this problem. The error typically occurs only when pushing a **whole directory**: `hdc file send` preserves the local directory name on the device, so pushing `outputs/` to `$REMOTE_PATH/` places the artifacts under `$REMOTE_PATH/outputs/`, not `$REMOTE_PATH/`.
 
-```bash
-hdc -t "$DEVICE_ID" shell "bm install -p $REMOTE_PATH/outputs"
-```
-
-Quick verification on device:
+To diagnose, check where the files actually landed:
 
 ```bash
 hdc -t "$DEVICE_ID" shell "find $REMOTE_PATH -maxdepth 2 -type f -print"
 ```
 
-If you are on Git Bash, also ensure `MSYS_NO_PATHCONV=1` is set before running `hdc`.
+Then point `bm install -p` at the directory that directly contains the packages. If you are on Git Bash, also ensure `MSYS_NO_PATHCONV=1` is set before running `hdc`.
 
 ## Prerequisites
 
@@ -50,14 +44,15 @@ All HAP/HSP modules must have the **same versionCode**. Mismatched versions caus
 # Using Python (cross-platform)
 python3 -c "
 import zipfile, json, glob
-for f in glob.glob('outputs/*.hsp'):
+for f in glob.glob('outputs/*.hap') + glob.glob('outputs/*.hsp'):
     z = zipfile.ZipFile(f)
     data = json.loads(z.read('module.json'))
     print(f\"{f.split('/')[-1]}: versionCode = {data['app']['versionCode']}\")
 "
 
 # Using unzip + grep (Linux/macOS)
-for f in outputs/*.hsp; do
+for f in outputs/*.hap outputs/*.hsp; do
+    [ -f "$f" ] || continue
     echo -n "$(basename $f): "
     unzip -p "$f" module.json | grep -o '"versionCode":[0-9]*'
 done
@@ -83,7 +78,9 @@ Save as `install.sh` (Linux/macOS/Git Bash):
 #!/bin/bash
 
 # === Configuration ===
-DEVICE_ID="${1:-$(hdc list targets | head -1)}"
+# hdc prints "[Empty]" (not empty output) when no device is connected;
+# strip \r for Git Bash on Windows.
+DEVICE_ID="${1:-$(hdc list targets | tr -d '\r' | grep -v '^\[Empty\]$' | head -1)}"
 SIGNED_PATH="${2:-outputs}"
 BUNDLE_NAME="${3:-}"
 REMOTE_PATH="//data/local/tmp/install_$(date +%s)"
