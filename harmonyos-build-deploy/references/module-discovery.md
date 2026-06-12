@@ -63,8 +63,9 @@ The module type is defined in each module's `module.json5` file:
 **To identify all module types in a project:**
 
 ```bash
-# Read type from each module's module.json5
-# Check {srcPath}/src/main/module.json5 for each module in build-profile.json5
+# Print the type of every module (excludes resolved dependencies in oh_modules/)
+find . -path ./oh_modules -prune -o -path "*/src/main/module.json5" -print \
+  | xargs grep -o '"type": *"[a-z]*"'
 ```
 
 ## Finding Module Build Outputs

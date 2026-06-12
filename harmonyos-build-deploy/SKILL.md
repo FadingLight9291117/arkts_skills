@@ -35,26 +35,11 @@ Complete workflow for building, cleaning, packaging, and installing HarmonyOS ap
 # Build complete app (incremental)
 hvigorw assembleApp --mode project -p product=default -p buildMode=release --no-daemon
 
-# Install to device (Git Bash compatible)
-# If you use Git Bash on Windows, disable MSYS path conversion for hdc commands.
-export MSYS_NO_PATHCONV=1
-
-INSTALL_DIR="//data/local/tmp/install_$(date +%s)"
-hdc -t <UDID> shell "mkdir -p $INSTALL_DIR"
-# Push files one-by-one to explicit remote file paths (most reliable on Git Bash)
-for f in outputs/*.hap outputs/*.hsp; do
-    [ -f "$f" ] && hdc -t <UDID> file send "$f" "$INSTALL_DIR/$(basename "$f")"
-done
-
-# Install (reinstall) HSPs first, then the HAP
-for f in outputs/*.hsp outputs/*.hap; do
-    [ -f "$f" ] && hdc -t <UDID> shell "bm install -p $INSTALL_DIR/$(basename \"$f\") -r"
-done
-
-hdc -t <UDID> shell "rm -rf $INSTALL_DIR"
+# List connected devices (returns UDID)
+hdc list targets
 ```
 
-**Note:** Build output path is `outputs/`.
+**Note:** Build output path is `outputs/`. For device installation, see [Push and Install](#push-and-install).
 
 ## Workflows
 

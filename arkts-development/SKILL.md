@@ -163,41 +163,21 @@ ArkTS enforces stricter rules than TypeScript for performance and safety:
 
 See [references/migration-guide.md](references/migration-guide.md) for complete TypeScript → ArkTS migration details.
 
-## Command Line Build (hvigorw)
+## Command Line Test (hvigorw)
 
-hvigorw is the Hvigor wrapper tool for command-line builds.
+Build, clean, packaging, and device installation are covered by the **harmonyos-build-deploy** skill — use it for those workflows. The complete hvigorw flag reference is in [references/hvigor-commandline.md](references/hvigor-commandline.md).
+
+Test commands:
 
 ```bash
-# Common build tasks
-hvigorw clean                              # Clean build directory
-hvigorw assembleHap -p buildMode=debug     # Build Hap (debug)
-hvigorw assembleApp -p buildMode=release   # Build App (release)
-hvigorw assembleHar                        # Build Har library
-hvigorw assembleHsp                        # Build Hsp
+# Run all tests for a module
+hvigorw onDeviceTest -p module=entry -p coverage=true --no-daemon   # On-device
+hvigorw test -p module=entry --no-daemon                            # Local (host-side)
 
-# Build specific module
-hvigorw assembleHap -p module=entry@default --mode module
-
-# Run tests
-hvigorw onDeviceTest -p module=entry -p coverage=true
-hvigorw test -p module=entry              # Local test
-
-# CI/CD recommended
-hvigorw assembleApp -p buildMode=release --no-daemon
+# Run a single test suite or single test (on-device)
+hvigorw onDeviceTest -p module=entry -p testParam="{\"unittest\":\"TestClassName\"}" --no-daemon
+hvigorw onDeviceTest -p module=entry -p testParam="{\"unittest\":\"TestClassName#testMethodName\"}" --no-daemon
 ```
-
-Common parameters:
-
-| Parameter | Description |
-|-----------|-------------|
-| `-p buildMode={debug\|release}` | Build mode |
-| `-p product={name}` | Target product (default: default) |
-| `-p module={name}@{target}` | Target module (with `--mode module`) |
-| `--no-daemon` | Disable daemon (recommended for CI) |
-| `--analyze=advanced` | Enable build analysis |
-| `--optimization-strategy=memory` | Memory-optimized build |
-
-See [references/hvigor-commandline.md](references/hvigor-commandline.md) for complete command reference.
 
 ## Code Linter (codelinter)
 
@@ -296,6 +276,8 @@ See [references/arkguard-obfuscation.md](references/arkguard-obfuscation.md) for
 ## Reference Files
 
 - **State Management V2**: [references/state-management-v2.md](references/state-management-v2.md) - Complete guide to V2 state management (@ComponentV2, @Local, @Param, @Event, @ObservedV2, @Trace, @Computed, @Monitor, @Provider, @Consumer)
+- **V1 to V2 Migration**: [references/state-management-v2-migration.md](references/state-management-v2-migration.md) - Step-by-step migration from V1 to V2 decorators
+- **V2 Best Practices**: [references/state-management-v2-practices.md](references/state-management-v2-practices.md) - V2 best practices and troubleshooting
 - **Migration Guide**: [references/migration-guide.md](references/migration-guide.md) - Complete TypeScript to ArkTS migration rules and examples
 - **Component Patterns**: [references/component-patterns.md](references/component-patterns.md) - Advanced component patterns and best practices
 - **API Reference**: [references/api-reference.md](references/api-reference.md) - Common HarmonyOS APIs
